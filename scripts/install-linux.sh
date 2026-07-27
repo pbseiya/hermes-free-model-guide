@@ -91,9 +91,36 @@ else
 fi
 
 # =============================================================================
-# Step 3: Configure OKMD AI Playground
+# Step 3: Install Antigravity CLI (agy)
 # =============================================================================
-step "Step 3: Configure OKMD AI Playground (Free Model)"
+step "Step 3: Install Antigravity CLI (agy)"
+
+info "Antigravity CLI (agy) uses Gemini free via Google Account"
+info "Good for fixing/repairing hermes when it has problems"
+
+if command -v agy &> /dev/null; then
+    ok "Found existing agy installation"
+else
+    warn "agy not found - Installing..."
+    if [ "$PLATFORM" = "mac" ]; then
+        curl -fsSL https://antigravity.google/cli/install.sh | bash 2>/dev/null || true
+    else
+        curl -fsSL https://antigravity.google/cli/install.sh | bash 2>/dev/null || true
+    fi
+    
+    if command -v agy &> /dev/null; then
+        ok "agy installed successfully"
+        info "Run 'agy' for first time to login with Google Account"
+    else
+        warn "agy installation failed - Can install manually later:"
+        echo "  curl -fsSL https://antigravity.google/cli/install.sh | bash"
+    fi
+fi
+
+# =============================================================================
+# Step 4: Configure OKMD AI Playground
+# =============================================================================
+step "Step 4: Configure OKMD AI Playground (Free Model)"
 
 echo ""
 echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
@@ -151,9 +178,9 @@ else
 fi
 
 # =============================================================================
-# Step 4: Telegram Bot Token (Optional)
+# Step 5: Telegram Bot Token (Optional)
 # =============================================================================
-step "Step 4: Telegram Bot (Optional)"
+step "Step 5: Telegram Bot (Optional)"
 
 echo ""
 echo "  สร้าง Telegram Bot:"
@@ -183,9 +210,242 @@ EOF
 fi
 
 # =============================================================================
-# Step 5: Verify Installation
+# Step 6: Setup PATH Environment
 # =============================================================================
-step "Step 5: Verify Installation"
+step "Step 6: Setup PATH Environment"
+
+info "Setting up PATH so you can run hermes, agy from any folder..."
+
+# Detect shell config file
+if [ -n "$ZSH_VERSION" ]; then
+    SHELL_CONFIG="$HOME/.zshrc"
+elif [ -n "$BASH_VERSION" ]; then
+    SHELL_CONFIG="$HOME/.bashrc"
+else
+    SHELL_CONFIG="$HOME/.profile"
+fi
+
+# Paths to add
+PATHS_TO_ADD=(
+    "$HOME/.local/bin"
+    "$HOME/.local/share/hermes/bin"
+    "$HOME/.local/bin/agy"
+)
+
+# Add paths if not already present
+for p in "${PATHS_TO_ADD[@]}"; do
+    if [ -d "$p" ]; then
+        if ! grep -q "export PATH=.*$p" "$SHELL_CONFIG" 2>/dev/null; then
+            echo "export PATH=\"$p:\$PATH\"" >> "$SHELL_CONFIG"
+            ok "Added to PATH: $p"
+        else
+            info "Already in PATH: $p"
+        fi
+    fi
+done
+
+# Update current session PATH
+export PATH="$HOME/.local/bin:$HOME/.local/share/hermes/bin:$PATH"
+ok "Current session PATH updated"
+
+# Verify commands are accessible
+echo ""
+info "Verifying commands..."
+if command -v hermes &> /dev/null; then
+    HERMES_VER=$(hermes --version 2>/dev/null || echo "installed")
+    ok "hermes: $HERMES_VER"
+else
+    warn "hermes not found in PATH"
+fi
+
+if command -v agy &> /dev/null; then
+    ok "agy: found"
+else
+    warn "agy not found in PATH (optional)"
+fi
+
+# =============================================================================
+# Step 7: Setup Auto-start Services (Linux/macOS)
+# =============================================================================
+step "Step 7: Setup Auto-start Services"
+
+# Find hermes executable
+HERMES_BIN=""
+if command -v hermes &> /dev/null; then
+    HERMES_BIN=$(which hermes)
+elif [ -f "$HOME/.local/share/hermes/bin/hermes" ]; then
+    HERMES_BIN="$HOME/.local/share/hermes/bin/hermes"
+fi
+
+if [ -z "$HERMES_BIN" ]; then
+    warn "hermes executable not found - Skipping auto-start setup"
+else
+    info "Found hermes at: $HERMES_BIN"
+    
+    if [ "$PLATFORM" = "linux" ]; then
+        # Linux: Use systemd user services
+        SYSTEMD_DIR="$HOME/.config/systemd/user"
+        mkdir -p "$SYSTEMD_DIR"
+        
+        # Create gateway service
+        cat > "$SYSTEMD_DIR/hermes-gateway.service" << EOF
+[Unit]
+Description=Hermes Agent Telegram Gateway
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=$HERMES_BIN gateway start
+Restart=on-failure
+RestartSec=10
+Environment=PATH=$HOME/.local/bin:$HOME/.local/share/hermes/bin:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target
+EOF
+        
+        # Create dashboard service
+        cat > "$SYSTEMD_DIR/hermes-dashboard.service" << EOF
+[Unit]
+Description=Hermes Agent Web Dashboard
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=$HERMES_BIN dashboard start
+Restart=on-failure
+RestartSec=10
+Environment=PATH=$HOME/.local/bin:$HOME/.local/share/hermes/bin:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target
+EOF
+
+        # Create desktop service (needs display, waits for desktop)
+        cat > "$SYSTEMD_DIR/hermes-desktop.service" << EOF
+[Unit]
+Description=Hermes Agent Desktop App
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStartPre=/bin/sleep 5
+ExecStart=$HERMES_BIN desktop
+Restart=on-failure
+RestartSec=10
+Environment=PATH=$HOME/.local/bin:$HOME/.local/share/hermes/bin:/usr/local/bin:/usr/bin:/bin
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=default.target
+EOF
+        
+        # Enable services
+        systemctl --user daemon-reload
+        systemctl --user enable hermes-gateway.service 2>/dev/null || true
+        systemctl --user enable hermes-dashboard.service 2>/dev/null || true
+        systemctl --user enable hermes-desktop.service 2>/dev/null || true
+        
+        ok "Created systemd user services"
+        ok "  - hermes-gateway.service (Telegram)"
+        ok "  - hermes-dashboard.service (Dashboard)"
+        ok "  - hermes-desktop.service (Desktop App)"
+        info "Start services with: systemctl --user start hermes-gateway hermes-dashboard hermes-desktop"
+        
+    elif [ "$PLATFORM" = "mac" ]; then
+        # macOS: Use launchd
+        LAUNCHD_DIR="$HOME/Library/LaunchAgents"
+        mkdir -p "$LAUNCHD_DIR"
+        
+        # Create gateway plist
+        cat > "$LAUNCHD_DIR/com.hermes.gateway.plist" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.hermes.gateway</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>$HERMES_BIN</string>
+        <string>gateway</string>
+        <string>start</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>$HOME/.local/bin:$HOME/.local/share/hermes/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+</dict>
+</plist>
+EOF
+        
+        # Create dashboard plist
+        cat > "$LAUNCHD_DIR/com.hermes.dashboard.plist" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.hermes.dashboard</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>$HERMES_BIN</string>
+        <string>dashboard</string>
+        <string>start</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>$HOME/.local/bin:$HOME/.local/share/hermes/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+</dict>
+</plist>
+EOF
+
+        # Create desktop plist (needs GUI, waits a bit)
+        cat > "$LAUNCHD_DIR/com.hermes.desktop.plist" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.hermes.desktop</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>sleep 5 && $HERMES_BIN desktop</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>$HOME/.local/bin:$HOME/.local/share/hermes/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+</dict>
+</plist>
+EOF
+        
+        ok "Created launchd agents"
+        ok "  - com.hermes.gateway.plist (Telegram)"
+        ok "  - com.hermes.dashboard.plist (Dashboard)"
+        ok "  - com.hermes.desktop.plist (Desktop App)"
+        info "Start services with: launchctl load ~/Library/LaunchAgents/com.hermes.*.plist"
+    fi
+fi
+
+# =============================================================================
+# Step 8: Verify Installation
+# =============================================================================
+step "Step 8: Verify Installation"
 
 echo ""
 if command -v hermes &> /dev/null; then
@@ -214,11 +474,30 @@ echo -e "${GREEN}╔════════════════════
 echo -e "${GREEN}║   ✅ Installation Complete!                              ║${NC}"
 echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
-echo "  Commands to try:"
-echo "    hermes              # Start chat"
-echo "    hermes model        # Change model"
-echo "    hermes doctor       # Check health"
-echo "    hermes gateway start # Start Telegram bot"
+echo -e "${CYAN}📦 Installed Components:${NC}"
+echo "  ✓ Hermes Agent"
+echo "  ✓ Antigravity CLI (agy) - Free Gemini access"
+echo "  ✓ OKMD AI Playground config (Free 23 models)"
+if [ -n "$TG_TOKEN" ]; then
+    echo "  ✓ Telegram Bot configuration"
+fi
+echo "  ✓ Auto-start services (Desktop + Dashboard + Telegram Gateway)"
 echo ""
-echo "  Docs: https://hermes-agent.nousresearch.com/docs/"
+echo -e "${CYAN}🚀 Quick Start Commands:${NC}"
+echo "  hermes                    # Start interactive chat"
+echo "  hermes desktop            # Open desktop app (auto-starts on login)"
+echo "  hermes dashboard          # Open web dashboard (auto-starts on login)"
+echo "  hermes gateway start      # Start Telegram bot (auto-starts on login)"
+echo "  hermes model              # Change AI model"
+echo "  hermes doctor             # Check system health"
+echo "  agy                       # Start Antigravity CLI (free Gemini)"
+echo ""
+echo -e "${CYAN}📝 Configuration Files:${NC}"
+echo "  ~/.hermes/config.yaml     # Main configuration"
+echo "  ~/.hermes/.env            # API keys and secrets"
+echo ""
+echo -e "${YELLOW}🔄 Restart your terminal to use hermes/agy from any folder${NC}"
+echo ""
+echo -e "${CYAN}📖 Documentation: https://hermes-agent.nousresearch.com/docs/${NC}"
+echo -e "${CYAN}🎮 OKMD Playground: https://playground.okmd.or.th${NC}"
 echo ""

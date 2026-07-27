@@ -442,6 +442,51 @@ hermes gateway start
 
 ---
 
+# 🚀 Auto-start Services หลังติดตั้ง
+
+## ใช้งานได้ทันทีหลัง Reboot
+
+สคริปต์ติดตั้งจะตั้งค่า **auto-start** ให้ทั้ง 3 บริการ:
+
+| บริการ | วิธีเริ่ม | Auto-start หลัง Reboot |
+|--------|----------|------------------------|
+| **Telegram Gateway** | `hermes gateway start` | ✅ เปิดอัตโนมัติ |
+| **Dashboard** | `hermes dashboard` | ✅ เปิดอัตโนมัติ (http://localhost:3030) |
+| **Desktop App** | `hermes desktop` | ✅ เปิดอัตโนมัติ |
+
+### วิธีการ Auto-start ตาม OS
+
+**Windows:**
+- ใช้ **Startup Folder** (`shell:startup`)
+- สร้าง shortcut ทั้ง 3 services
+- จะเริ่มทำงานทันทีหลัง login
+
+**Linux (systemd):**
+```bash
+# ตรวจสอบสถานะ
+systemctl --user status hermes-gateway
+systemctl --user status hermes-dashboard
+systemctl --user status hermes-desktop
+
+# เริ่ม/หยุด services
+systemctl --user start hermes-gateway
+systemctl --user start hermes-dashboard
+systemctl --user start hermes-desktop
+```
+
+**macOS (launchd):**
+```bash
+# ตรวจสอบสถานะ
+launchctl list | grep hermes
+
+# Load services (ถ้ายังไม่ load)
+launchctl load ~/Library/LaunchAgents/com.hermes.gateway.plist
+launchctl load ~/Library/LaunchAgents/com.hermes.dashboard.plist
+launchctl load ~/Library/LaunchAgents/com.hermes.desktop.plist
+```
+
+---
+
 # ✅ Module 6: ทดสอบใช้งาน
 
 ## ทดสอบใน Terminal

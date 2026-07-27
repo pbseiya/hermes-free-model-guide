@@ -1,6 +1,7 @@
 # =============================================================================
 # Hermes Agent Quick Install Script (Windows PowerShell)
-# Installs Hermes Agent + configures OKMD AI Playground (Free Model)
+# Installs: Hermes Agent + agy + OKMD AI Playground (Free Model)
+# Features: User-space install, PATH setup, Desktop/Dashboard/Telegram auto-start
 # No admin required — everything in user-space
 # =============================================================================
 
@@ -30,8 +31,10 @@ Write-Host ""
 # User-space directories
 $HermesHome = Join-Path $env:USERPROFILE ".hermes"
 $LocalBin = Join-Path $env:USERPROFILE ".local\bin"
+$NpmGlobal = Join-Path $env:USERPROFILE ".npm-global"
 New-Item -ItemType Directory -Path $HermesHome -Force | Out-Null
 New-Item -ItemType Directory -Path $LocalBin -Force | Out-Null
+New-Item -ItemType Directory -Path $NpmGlobal -Force | Out-Null
 
 # =============================================================================
 # Step 1: Check Prerequisites
@@ -86,13 +89,6 @@ if ($nodeCmd) {
             Remove-Item $extracted.FullName -Force -Recurse
         }
         
-        # Add to PATH
-        $env:Path = "$nodeDir;$env:Path"
-        $userPath = [System.Environment]::GetEnvironmentVariable('Path', 'User')
-        if ($userPath -notlike "*$nodeDir*") {
-            [System.Environment]::SetEnvironmentVariable('Path', "$nodeDir;$userPath", 'User')
-        }
-        
         Write-Ok "Node.js installed: $(node --version)"
     } catch {
         Write-Warn "Node.js download failed"
@@ -115,15 +111,6 @@ if ($hermesCmd) {
     
     try {
         npm install -g hermes-agent 2>&1 | Out-Null
-        
-        # Add npm global to PATH
-        $npmGlobal = (npm config get prefix)
-        $env:Path = "$npmGlobal;$env:Path"
-        $userPath = [System.Environment]::GetEnvironmentVariable('Path', 'User')
-        if ($userPath -notlike "*$npmGlobal*") {
-            [System.Environment]::SetEnvironmentVariable('Path', "$npmGlobal;$userPath", 'User')
-        }
-        
         Write-Ok "Hermes installed successfully"
     } catch {
         Write-Err "Failed to install Hermes Agent"
@@ -131,9 +118,33 @@ if ($hermesCmd) {
 }
 
 # =============================================================================
-# Step 4: Configure OKMD AI Playground
+# Step 4: Install Antigravity CLI (agy)
 # =============================================================================
-Write-Step "Step 4: Configure OKMD AI Playground (Free Model)"
+Write-Step "Step 4: Install Antigravity CLI (agy)"
+
+Write-Info "Antigravity CLI (agy) uses Gemini free via Google Account"
+Write-Info "Good for fixing/repairing hermes when it has problems"
+
+$agyCmd = Get-Command agy -ErrorAction SilentlyContinue
+if ($agyCmd) {
+    Write-Ok "Found existing agy installation"
+} else {
+    Write-Warn "agy not found - Installing..."
+    try {
+        irm https://antigravity.google/cli/install.ps1 | iex
+        $agyBin = Join-Path $env:LOCALAPPDATA "agy" | Join-Path -ChildPath "bin"
+        Write-Ok "agy installed → $agyBin"
+        Write-Ok "Start agy for first time to login with Google Account"
+    } catch {
+        Write-Warn "agy installation failed - Can install manually later:"
+        Write-Host "  PowerShell: irm https://antigravity.google/cli/install.ps1 | iex" -ForegroundColor Yellow
+    }
+}
+
+# =============================================================================
+# Step 5: Configure OKMD AI Playground
+# =============================================================================
+Write-Step "Step 5: Configure OKMD AI Playground (Free Model)"
 
 Write-Host ""
 Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
@@ -198,9 +209,9 @@ NODE_TLS_REJECT_UNAUTHORIZED=0
 }
 
 # =============================================================================
-# Step 5: Telegram Bot Token (Optional)
+# Step 6: Telegram Bot Token (Optional)
 # =============================================================================
-Write-Step "Step 5: Telegram Bot (Optional)"
+Write-Step "Step 6: Telegram Bot (Optional)"
 
 Write-Host ""
 Write-Host "  สร้าง Telegram Bot:" -ForegroundColor White
@@ -234,46 +245,227 @@ TELEGRAM_ALLOWED_USERS=$TgUserId
 }
 
 # =============================================================================
-# Step 6: Verify Installation
+# Step 7: Setup PATH Environment
 # =============================================================================
-Write-Step "Step 6: Verify Installation"
+Write-Step "Step 7: Setup PATH Environment"
 
+Write-Info "Setting up PATH so you can run hermes, agy from any folder..."
+
+# Collect all paths to add
+$pathsToAdd = @(
+    $NpmGlobal,
+    (Join-Path $env:USERPROFILE ".local\node"),
+    (Join-Path $env:USERPROFILE ".local\bin")
+)
+
+# Add agy bin path if exists
+$agyBin = Join-Path $env:LOCALAPPDATA "agy\bin"
+if (Test-Path $agyBin) {
+    $pathsToAdd += $agyBin
+}
+
+# Get current user PATH
+$userPath = [System.Environment]::GetEnvironmentVariable('Path', 'User')
+$pathsAdded = @()
+
+foreach ($p in $pathsToAdd) {
+    if (Test-Path $p -ErrorAction SilentlyContinue) {
+        if ($userPath -notlike "*$p*") {
+            $userPath = "$p;$userPath"
+            $pathsAdded += $p
+            Write-Ok "Added to PATH: $p"
+        } else {
+            Write-Info "Already in PATH: $p"
+        }
+    }
+}
+
+# Update user PATH permanently
+if ($pathsAdded.Count -gt 0) {
+    [System.Environment]::SetEnvironmentVariable('Path', $userPath, 'User')
+    Write-Ok "User PATH updated permanently"
+}
+
+# Update current session PATH
+$env:Path = "$($pathsToAdd -join ';');$env:Path"
+Write-Ok "Current session PATH updated"
+
+# Verify commands are accessible
 Write-Host ""
-$hermesCmd = Get-Command hermes -ErrorAction SilentlyContinue
-if ($hermesCmd) {
+Write-Info "Verifying commands..."
+if (Get-Command hermes -ErrorAction SilentlyContinue) {
     $hermesVer = hermes --version 2>$null
-    Write-Ok "Hermes: $hermesVer"
+    Write-Ok "hermes: $hermesVer"
 } else {
-    Write-Warn "hermes command not found — restart PowerShell first"
+    Write-Warn "hermes not found in PATH"
 }
 
-$configPath = Join-Path $HermesHome "config.yaml"
-if (Test-Path $configPath) {
-    Write-Ok "config.yaml: exists"
+if (Get-Command agy -ErrorAction SilentlyContinue) {
+    Write-Ok "agy: found"
 } else {
-    Write-Warn "config.yaml: not found"
-}
-
-$envPath = Join-Path $HermesHome ".env"
-if (Test-Path $envPath) {
-    Write-Ok ".env: exists"
-} else {
-    Write-Warn ".env: not found"
+    Write-Warn "agy not found in PATH (optional)"
 }
 
 # =============================================================================
-# Done!
+# Step 8: Setup Auto-start (Desktop, Dashboard, Telegram)
 # =============================================================================
+Write-Step "Step 8: Setup Auto-start Services"
+
+# Find hermes executable
+$hermesCmd = Get-Command hermes -ErrorAction SilentlyContinue
+$hermesBin = $null
+if ($hermesCmd) {
+    $hermesBin = $hermesCmd.Source
+} elseif (Test-Path (Join-Path $NpmGlobal "hermes.cmd")) {
+    $hermesBin = Join-Path $NpmGlobal "hermes.cmd"
+}
+
+if (-not $hermesBin) {
+    Write-Warn "hermes executable not found - Skipping auto-start setup"
+} else {
+    Write-Info "Found hermes at: $hermesBin"
+    
+    # Create startup scripts directory
+    $startupDir = Join-Path $HermesHome "startup"
+    if (-not (Test-Path $startupDir)) {
+        New-Item -ItemType Directory -Path $startupDir -Force | Out-Null
+    }
+    
+    # Create batch file for gateway (Telegram)
+    $gatewayBat = Join-Path $startupDir "hermes-gateway.bat"
+    $gatewayContent = @"
+@echo off
+set PATH=$NpmGlobal;$env:Path
+"$hermesBin" gateway start
+"@
+    $gatewayContent | Set-Content $gatewayBat -Encoding ASCII
+    
+    # Create batch file for dashboard
+    $dashboardBat = Join-Path $startupDir "hermes-dashboard.bat"
+    $dashboardContent = @"
+@echo off
+set PATH=$NpmGlobal;$env:Path
+"$hermesBin" dashboard start
+"@
+    $dashboardContent | Set-Content $dashboardBat -Encoding ASCII
+    
+    # Create batch file for desktop
+    $desktopBat = Join-Path $startupDir "hermes-desktop.bat"
+    $desktopContent = @"
+@echo off
+set PATH=$NpmGlobal;$env:Path
+timeout /t 10 /nobreak >nul
+"$hermesBin" desktop
+"@
+    $desktopContent | Set-Content $desktopBat -Encoding ASCII
+    
+    # Create Windows Task Scheduler tasks
+    try {
+        # Remove old tasks if exist
+        schtasks /Delete /TN "HermesGateway" /F 2>$null
+        schtasks /Delete /TN "HermesDashboard" /F 2>$null
+        schtasks /Delete /TN "HermesDesktop" /F 2>$null
+        
+        # Create task for gateway (run at logon)
+        $action = New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c `"$gatewayBat`""
+        $trigger = New-ScheduledTaskTrigger -AtLogOn
+        $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Days 0)
+        $principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -RunLevel Limited
+        
+        Register-ScheduledTask -TaskName "HermesGateway" -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description "Hermes Agent Telegram Gateway" -Force | Out-Null
+        
+        # Create task for dashboard (run at logon)
+        $action2 = New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c `"$dashboardBat`""
+        $trigger2 = New-ScheduledTaskTrigger -AtLogOn
+        
+        Register-ScheduledTask -TaskName "HermesDashboard" -Action $action2 -Trigger $trigger2 -Settings $settings -Principal $principal -Description "Hermes Agent Web Dashboard" -Force | Out-Null
+        
+        # Create task for desktop (run at logon, needs GUI)
+        $action3 = New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c `"$desktopBat`""
+        $trigger3 = New-ScheduledTaskTrigger -AtLogOn
+        
+        Register-ScheduledTask -TaskName "HermesDesktop" -Action $action3 -Trigger $trigger3 -Settings $settings -Principal $principal -Description "Hermes Agent Desktop App" -Force | Out-Null
+        
+        Write-Ok "Created Windows Task Scheduler tasks"
+        Write-Ok "  - HermesGateway (Telegram)"
+        Write-Ok "  - HermesDashboard (Dashboard)"
+        Write-Ok "  - HermesDesktop (Desktop App)"
+        Write-Info "Start services with: schtasks /Run /TN `"HermesGateway`" && schtasks /Run /TN `"HermesDashboard`" && schtasks /Run /TN `"HermesDesktop`""
+    } catch {
+        Write-Warn "Task Scheduler creation failed - Using Startup Folder instead"
+        
+        # Use Startup Folder instead
+        $startupFolder = $env:APPDATA + '\Microsoft\Windows\Start Menu\Programs\Startup'
+        
+        # Create shortcut for gateway
+        $wsGateway = New-Object -ComObject WScript.Shell
+        $shortcutGateway = $wsGateway.CreateShortcut((Join-Path $startupFolder "HermesGateway.lnk"))
+        $shortcutGateway.TargetPath = "cmd.exe"
+        $shortcutGateway.Arguments = "/c `"$gatewayBat`""
+        $shortcutGateway.WindowStyle = 7  # Minimized
+        $shortcutGateway.Save()
+        
+        # Create shortcut for dashboard
+        $shortcutDashboard = $wsGateway.CreateShortcut((Join-Path $startupFolder "HermesDashboard.lnk"))
+        $shortcutDashboard.TargetPath = "cmd.exe"
+        $shortcutDashboard.Arguments = "/c `"$dashboardBat`""
+        $shortcutDashboard.WindowStyle = 7  # Minimized
+        $shortcutDashboard.Save()
+        
+        # Create shortcut for desktop
+        $shortcutDesktop = $wsGateway.CreateShortcut((Join-Path $startupFolder "HermesDesktop.lnk"))
+        $shortcutDesktop.TargetPath = "cmd.exe"
+        $shortcutDesktop.Arguments = "/c `"$desktopBat`""
+        $shortcutDesktop.WindowStyle = 1  # Normal window (needs GUI)
+        $shortcutDesktop.Save()
+        
+        Write-Ok "Created Startup Folder shortcuts"
+        Write-Ok "  - HermesGateway.lnk (Telegram)"
+        Write-Ok "  - HermesDashboard.lnk (Dashboard)"
+        Write-Ok "  - HermesDesktop.lnk (Desktop App)"
+    }
+}
+
+# =============================================================================
+# Step 9: Final Summary
+# =============================================================================
+Write-Step "Step 9: Installation Complete!"
+
 Write-Host ""
 Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║   ✓ Installation Complete!                               ║" -ForegroundColor Green
+Write-Host "║              ✓ Installation Complete!                    ║" -ForegroundColor Green
 Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Green
 Write-Host ""
-Write-Host "  Commands to try:" -ForegroundColor White
-Write-Host "    hermes              # Start chat" -ForegroundColor White
-Write-Host "    hermes model        # Change model" -ForegroundColor White
-Write-Host "    hermes doctor       # Check health" -ForegroundColor White
-Write-Host "    hermes gateway start # Start Telegram bot" -ForegroundColor White
+
+Write-Host "📦 Installed Components:" -ForegroundColor Cyan
+Write-Host "  ✓ Node.js v22 (user-space)" -ForegroundColor White
+Write-Host "  ✓ Hermes Agent (via npm)" -ForegroundColor White
+Write-Host "  ✓ Antigravity CLI (agy) - Free Gemini access" -ForegroundColor White
+Write-Host "  ✓ OKMD AI Playground config (Free 23 models)" -ForegroundColor White
+if ($TelegramToken) {
+    Write-Host "  ✓ Telegram Bot configuration" -ForegroundColor White
+}
+Write-Host "  ✓ Auto-start services (Desktop + Dashboard + Telegram Gateway)" -ForegroundColor White
 Write-Host ""
-Write-Host "  Docs: https://hermes-agent.nousresearch.com/docs/" -ForegroundColor White
+
+Write-Host "🚀 Quick Start Commands:" -ForegroundColor Cyan
+Write-Host "  hermes                    # Start interactive chat" -ForegroundColor White
+Write-Host "  hermes desktop            # Open desktop app (auto-starts on login)" -ForegroundColor White
+Write-Host "  hermes dashboard          # Open web dashboard (auto-starts on login)" -ForegroundColor White
+Write-Host "  hermes gateway start      # Start Telegram bot (auto-starts on login)" -ForegroundColor White
+Write-Host "  hermes model              # Change AI model" -ForegroundColor White
+Write-Host "  hermes doctor             # Check system health" -ForegroundColor White
+Write-Host "  agy                       # Start Antigravity CLI (free Gemini)" -ForegroundColor White
+Write-Host ""
+
+Write-Host "📝 Configuration Files:" -ForegroundColor Cyan
+Write-Host "  ~/.hermes/config.yaml     # Main configuration" -ForegroundColor White
+Write-Host "  ~/.hermes/.env            # API keys and secrets" -ForegroundColor White
+Write-Host ""
+
+Write-Host "🔄 Restart your terminal to use hermes/agy from any folder" -ForegroundColor Yellow
+Write-Host ""
+
+Write-Host "📖 Documentation: https://hermes-agent.nousresearch.com/docs/" -ForegroundColor Cyan
+Write-Host "🎮 OKMD Playground: https://playground.okmd.or.th" -ForegroundColor Cyan
 Write-Host ""

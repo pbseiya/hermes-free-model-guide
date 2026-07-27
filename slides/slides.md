@@ -487,6 +487,41 @@ launchctl load ~/Library/LaunchAgents/com.hermes.desktop.plist
 
 ---
 
+# 🗑️ Uninstallation
+
+## วิธีลบ Hermes Agent ออกทั้งหมด
+
+### Windows (PowerShell)
+```powershell
+# Basic uninstall
+$f="$env:TEMP\hermes-uninstall.ps1"; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1' -OutFile $f -UseBasicParsing; powershell -ExecutionPolicy Bypass -File $f; Remove-Item $f
+
+# Full uninstall (include agy and Node.js)
+$f="$env:TEMP\hermes-uninstall.ps1"; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1' -OutFile $f -UseBasicParsing; powershell -ExecutionPolicy Bypass -File $f -RemoveAgy -RemoveNode -Force; Remove-Item $f
+```
+
+### Linux / macOS
+```bash
+# Basic uninstall
+curl -fsSL https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-linux.sh | bash
+
+# Full uninstall (include agy and Node.js)
+curl -fsSL https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-linux.sh | bash -s -- --remove-agy --remove-node --force
+```
+
+### สิ่งที่ Uninstall Script ลบออก
+
+| รายการ | ลบอัตโนมัติ? |
+|--------|-------------|
+| Hermes Agent และ configuration | ✅ |
+| Startup services (Desktop, Dashboard, Telegram) | ✅ |
+| `~/.hermes` directory | ✅ |
+| PATH entries | ✅ |
+| **agy** (Antigravity CLI) | ⚠️ ใช้ `--remove-agy` |
+| **Node.js** | ⚠️ ใช้ `--remove-node` |
+
+---
+
 # ✅ Module 6: ทดสอบใช้งาน
 
 ## ทดสอบใน Terminal

@@ -44,7 +44,9 @@ hermes-free-model-guide/
 │   └── README.md                # วิธี render slides
 ├── scripts/
 │   ├── install-windows.ps1      # Windows installer
-│   └── install-linux.sh         # Linux/macOS installer
+│   ├── install-linux.sh         # Linux/macOS installer
+│   ├── uninstall-windows.ps1    # Windows uninstaller
+│   └── uninstall-linux.sh       # Linux/macOS uninstaller
 ├── guides/
 │   ├── 01-what-is-hermes.md     # Hermes คืออะไร?
 │   ├── 02-installation.md       # คู่มือติดตั้ง 3 OS
@@ -55,6 +57,37 @@ hermes-free-model-guide/
 └── templates/
     └── config.yaml              # ตัวอย่าง config (placeholder — ไม่มี key จริง)
 ```
+
+---
+
+## 🗑️ Uninstallation
+
+### Windows (PowerShell)
+```powershell
+# Basic uninstall
+$f="$env:TEMP\hermes-uninstall.ps1"; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1' -OutFile $f -UseBasicParsing; powershell -ExecutionPolicy Bypass -File $f; Remove-Item $f
+
+# Full uninstall (include agy and Node.js)
+$f="$env:TEMP\hermes-uninstall.ps1"; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1' -OutFile $f -UseBasicParsing; powershell -ExecutionPolicy Bypass -File $f -RemoveAgy -RemoveNode -Force; Remove-Item $f
+```
+
+### Linux / macOS
+```bash
+# Basic uninstall
+curl -fsSL https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-linux.sh | bash
+
+# Full uninstall (include agy and Node.js)
+curl -fsSL https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-linux.sh | bash -s -- --remove-agy --remove-node --force
+```
+
+### สิ่งที่ Uninstall Script ลบออก
+
+- ✅ Hermes Agent และ configuration ทั้งหมด
+- ✅ Startup services (Desktop, Dashboard, Telegram Gateway)
+- ✅ `~/.hermes` directory (sessions, logs, config)
+- ✅ PATH entries
+- ⚠️ **agy** (Antigravity CLI) — ลบด้วย `--remove-agy` หรือ `-RemoveAgy`
+- ⚠️ **Node.js** — ลบด้วย `--remove-node` หรือ `-RemoveNode`
 
 ---
 

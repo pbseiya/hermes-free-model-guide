@@ -97,7 +97,7 @@ step "Step 3: Configure OKMD AI Playground (Free Model)"
 
 echo ""
 echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║   OKMD AI Playground — Free 200K tokens/day              ║${NC}"
+echo -e "${CYAN}║   OKMD AI Playground — Free up to 1M tokens/day         ║${NC}"
 echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo "  สมัครฟรีที่: https://playground.okmd.or.th"

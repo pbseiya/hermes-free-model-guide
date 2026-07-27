@@ -43,7 +43,7 @@ style: |
 
 **สิ่งที่ได้ทำวันนี้:**
 1. ✅ ติดตั้ง Hermes Agent (Windows / Linux / macOS)
-2. ✅ สมัคร OKMD AI Playground (ฟรี 200K tokens/day)
+2. ✅ สมัคร OKMD AI Playground (ฟรีสูงสุด 1M tokens/day)
 3. ✅ ตั้งค่า Hermes ให้ใช้ Free Model
 4. ✅ สร้าง Telegram Bot — คุยกับ AI ผ่าน Telegram
 5. ✅ ทดสอบใช้งานจริง

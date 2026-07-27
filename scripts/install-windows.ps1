@@ -137,7 +137,7 @@ Write-Step "Step 4: Configure OKMD AI Playground (Free Model)"
 
 Write-Host ""
 Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║   OKMD AI Playground — Free 200K tokens/day              ║" -ForegroundColor Cyan
+Write-Host "║   OKMD AI Playground — Free up to 1M tokens/day         ║" -ForegroundColor Cyan
 Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  สมัครฟรีที่: https://playground.okmd.or.th" -ForegroundColor White

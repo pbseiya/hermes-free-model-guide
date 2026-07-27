@@ -3,7 +3,7 @@ marp: true
 theme: default
 paginate: true
 header: "Course 0: ติดตั้ง Hermes Agent + Free Model"
-footer: "ใช้ OKMD AI Playground — ฟรี 200K tokens/day"
+footer: "ใช้ OKMD AI Playground — ฟรี 23 models สูงสุด 1M tokens/day"
 style: |
   section {
     font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
@@ -83,28 +83,50 @@ style: |
 
 # 💰 Free Model ที่เราจะใช้: OKMD AI Playground
 
-## ฟรี 200,000 tokens/day — จากภาครัฐไทย!
+## ฟรี 23 Models — สูงสุด 1M tokens/day — จากภาครัฐไทย!
 
 <div class="success">
 
 **OKMD AI Playground** = บริการ AI ฟรี จาก OKMD (สำนักงานบริหารและพัฒนาองค์ความรู้)
 
 - ✅ **ฟรี** สำหรับสมาชิก TK Park (สมัครฟรี)
-- ✅ **200,000 tokens/day** — ใช้ได้ไม่หมดในชีวิตประจำวัน
-- ✅ **Models ระดับโลก** — Gemini 3.5 Flash, Claude Sonnet 5, DeepSeek V4 Pro
+- ✅ **23 Models** — GPT-5.4, Claude Sonnet 5, DeepSeek V4, Gemini, Llama 4, Grok
+- ✅ **Quota สูงสุด 1M tokens/day** (DeepSeek) — ใช้ได้ไม่หมดในชีวิตประจำวัน
+- ✅ **Quota share กันทั้ง Provider** — ใช้ model ใดใน provider ก็หักจาก quota รวม
 - ✅ **OpenAI-compatible** — ใช้กับ tools ที่มีอยู่แล้วได้เลย
 
 </div>
 
-### Models ที่มีให้ใช้ฟรี
+### Models ที่มีให้ใช้ฟรี (23 Models!)
 
-| Model | Provider | เหมาะสำหรับ |
-|-------|----------|-------------|
-| `gemini-3.5-flash` | Google | เร็ว, ฉลาด, ใช้ทั่วไป |
-| `gemini-3.1-flash-lite` | Google | เร็วมาก, context 1M tokens |
-| `claude-sonnet-5` | Anthropic | ฉลาดที่สุด, งานซับซ้อน |
-| `deepseek-v4-pro` | DeepSeek | Reasoning, วิเคราะห์ |
-| `llama-4-scout` | Meta AI | Opensource, ภาษาดี |
+| Model | Provider | Quota/วัน | เหมาะสำหรับ |
+|-------|----------|-----------|-------------|
+| `gpt-5.4` | OpenAI | 350K | ฉลาดสุดของ OpenAI |
+| `gpt-5.4-mini` | OpenAI | 350K | สมดุลดี |
+| `gpt-5.4-nano` | OpenAI | 350K | เร็ว, เบา |
+| `claude-sonnet-5` | Anthropic | 180K | ฉลาด, งานซับซ้อน |
+| `claude-sonnet-4.6` | Anthropic | 180K | รุ่นก่อน, เสถียร |
+| `deepseek-v4-pro` | DeepSeek | **1M** | Reasoning, วิเคราะห์ |
+| `deepseek-v4-flash` | DeepSeek | **1M** | เร็ว, quota เยอะ |
+| `llama-4-maverick` | Meta AI | 200K | Opensource, ฉลาด |
+| `llama-4-scout` | Meta AI | 200K | Opensource, เร็ว |
+| `grok-4.3` | xAI | 100K | ข้อมูลล่าสุด |
+| `qwen3.7-plus` | Qwen | 100K | ภาษาดี |
+| `qwen3.7-max` | Qwen | 100K | ฉลาด |
+| `qwen3.6-flash` | Qwen | 100K | เร็ว |
+| `gemini-2.5-flash-lite` | Google | 200K | เร็ว, เบา |
+| `mistral-medium-3.1` | Mistral | 100K | ยุโรป, หลายภาษา |
+| `nova-pro-v1` | AWS | 200K | AWS |
+| `nova-2-lite-v1` | AWS | 200K | เร็ว, เบา |
+
+<div class="warning">
+
+**⚠️ Quota share กันทั้ง Provider!**
+- ใช้ `gpt-5.4` 100K → `gpt-5.4-mini` เหลือ 250K (ไม่ใช่ได้คนละ 350K!)
+- ใช้ chat ที่ web playground.okmd.or.th ก็หัก quota ด้วย
+- เช็ค quota: ดูที่ Usage ใน OKMD Playground หรือ `hermes insights`
+
+</div>
 
 ---
 
@@ -238,7 +260,8 @@ hermes setup
 1. **Provider** → Custom endpoint
 2. **Base URL** → `https://gen.ai.kku.ac.th/okmd/api/v1`
 3. **API Key** → วาง OKMD key ที่ copy มา
-4. **Model** → `gemini-3.5-flash`
+4. **Model** → `gpt-5.4-mini` (แนะนำ — 350K quota)
+   หรือ `deepseek-v4-flash` (1M quota เยอะสุด)
 
 ### วิธีที่ 2: แก้ config เอง
 
@@ -260,7 +283,7 @@ hermes config edit
 # ~/.hermes/config.yaml
 model:
   provider: custom:okmd
-  default: gemini-3.5-flash
+  default: gpt-5.4-mini
 
 providers:
   okmd:
@@ -339,19 +362,26 @@ curl -sk https://gen.ai.kku.ac.th/okmd/api/v1/models \
 
 ```
 # ใน Hermes chat
-/model gemini-3.5-flash
+/model gpt-5.4-mini
+/model deepseek-v4-flash
 /model claude-sonnet-5
-/model deepseek-v4-pro
+/model llama-4-maverick
 ```
 
-### Models ฟรีที่น่าใช้
+### Models ฟรีที่น่าใช้ (เรียงตาม Quota)
 
-| Model | Speed | Intelligence | ใช้เมื่อ |
-|-------|-------|-------------|---------|
-| `gemini-3.5-flash` | ⚡⚡⚡ | 🧠🧠 | งานทั่วไป, เร็ว |
-| `gemini-3.1-flash-lite` | ⚡⚡⚡⚡ | 🧠 | งานเบา, context ยาว |
-| `claude-sonnet-5` | ⚡ | 🧠🧠🧠🧠 | งานซับซ้อน, เขียนโค้ด |
-| `deepseek-v4-pro` | ⚡⚡ | 🧠🧠🧠 | Reasoning, วิเคราะห์ |
+| Model | Quota/วัน | Speed | Intelligence | ใช้เมื่อ |
+|-------|-----------|-------|-------------|---------|
+| `deepseek-v4-flash` | **1M** | ⚡⚡⚡ | 🧠🧠🧠 | ใช้เยอะ, quota เยอะสุด |
+| `deepseek-v4-pro` | **1M** | ⚡⚡ | 🧠🧠🧠🧠 | Reasoning, วิเคราะห์ |
+| `gpt-5.4` | 350K | ⚡⚡ | 🧠🧠🧠🧠 | ฉลาดสุดของ OpenAI |
+| `gpt-5.4-mini` | 350K | ⚡⚡⚡ | 🧠🧠🧠 | **แนะนำ** สมดุลดี |
+| `gpt-5.4-nano` | 350K | ⚡⚡⚡⚡ | 🧠🧠 | เร็ว, เบา |
+| `llama-4-maverick` | 200K | ⚡⚡ | 🧠🧠🧠 | Opensource, ฉลาด |
+| `claude-sonnet-5` | 180K | ⚡ | 🧠🧠🧠🧠 | งานซับซ้อน, เขียนโค้ด |
+| `gemini-2.5-flash-lite` | 200K | ⚡⚡⚡⚡ | 🧠🧠 | เร็ว, เบา |
+| `grok-4.3` | 100K | ⚡⚡ | 🧠🧠🧠 | ข้อมูลล่าสุด |
+| `qwen3.7-plus` | 100K | ⚡⚡ | 🧠🧠🧠 | ภาษาดี |
 
 ---
 
@@ -447,7 +477,7 @@ Search for: AI news 2026  # ทดสอบ web search
 
 ---
 
-# 📊 ตรวจสอบ Quota Usage
+## 📊 ตรวจสอบ Quota Usage
 
 ## ดูว่าใช้ไปเท่าไหร่แล้ว
 
@@ -455,13 +485,37 @@ OKMD API จะบอก quota ในทุก response:
 
 ```json
 "model_quota": {
-  "daily_quota_tokens": 200000,
+  "daily_quota_tokens": 350000,
   "daily_usage_tokens": 1500,
-  "daily_remaining_tokens": 198500
+  "daily_remaining_tokens": 348500
 }
 ```
 
-### ดู quota ผ่าน Hermes
+### Quota รวมตาม Provider (ข้อมูลจริง Jul 2026)
+
+| Provider | Quota รวม/วัน | Models ใน Provider |
+|----------|--------------|---------------------|
+| **Deepseek** | **1,000,000** | `deepseek-v4-pro`, `deepseek-v4-flash` |
+| **OpenAI** | 350,000 | `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.4-nano` |
+| **Gemini** | 200,000 | `gemini-3.5-flash`, `gemini-3.1-flash-lite`, `gemini-2.5-flash-lite` + อื่นๆ |
+| **Meta AI** | 200,000 | `llama-4-maverick`, `llama-4-scout` |
+| **Nova (AWS)** | 200,000 | `nova-pro-v1`, `nova-2-lite-v1` |
+| **Claude** | 180,000 | `claude-sonnet-5`, `claude-sonnet-4.6` |
+| **xAI** | 100,000 | `grok-4.3` |
+| **Perplexity** | 100,000 | `sonar-pro` |
+| **Qwen** | 100,000 | `qwen3.7-plus`, `qwen3.7-max`, `qwen3.6-flash` |
+| **Mistral** | 100,000 | `mistral-medium-3.1` |
+
+<div class="warning">
+
+**⚠️ Quota share กันทั้ง Provider!**
+- ใช้ `gpt-5.4` ไป 100K → `gpt-5.4-mini` เหลือแค่ 250K (ไม่ใช่ได้คนละ 350K!)
+- ใช้ chat ที่ web playground.okmd.or.th ก็หัก quota ด้วย
+- เช็ค quota: ดูที่ **Usage** ใน OKMD Playground
+
+</div>
+
+### เช็ค quota ผ่าน Hermes
 
 ```bash
 hermes insights
@@ -469,12 +523,14 @@ hermes insights
 
 <div class="success">
 
-**200,000 tokens/day = ประมาณ:**
-- 💬 200+ บทสนทนา/วัน
-- 📄 อ่านเอกสาร ~50 หน้า/วัน
-- 🔧 รันคำสั่ง ~100 ครั้ง/วัน
+**Quota share กันทั้ง Provider** — ใช้ model หนึ่งหักจาก quota รวมของ provider นั้น
 
-**ใช้ได้สบายๆ ตลอดวัน ไม่มีหมด!**
+**1M tokens (DeepSeek) = ประมาณ:**
+- 💬 1,000+ บทสนทนา/วัน
+- 📄 อ่านเอกสาร ~250 หน้า/วัน
+- 🔧 รันคำสั่ง ~500 ครั้ง/วัน
+
+**ใช้ได้สบายๆ ไม่มีหมด!**
 
 </div>
 

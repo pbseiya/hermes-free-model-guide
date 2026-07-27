@@ -117,7 +117,7 @@ if [ -n "$OKMD_KEY" ]; then
 
 model:
   provider: custom:okmd
-  default: gemini-3.5-flash
+  default: gpt-5.4-mini
 
 providers:
   okmd:
@@ -144,8 +144,8 @@ EOF
 
     echo ""
     ok "OKMD configuration complete!"
-    info "Default model: gemini-3.5-flash"
-    info "Free quota: 200,000 tokens/day"
+    info "Default model: gpt-5.4-mini (350K tokens/day)"
+    info "DeepSeek V4 Flash: 1M tokens/day (quota เยอะสุด)"
 else
     warn "Skipping OKMD setup — you can configure later with: hermes setup"
 fi

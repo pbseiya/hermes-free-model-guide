@@ -60,13 +60,39 @@ hermes-free-model-guide/
 
 ## 🔑 Free Models ที่แนะนำ (อัปเดต Jul 2026)
 
-| Provider | Model | Rate Limit | จุดเด่น | สมัคร |
-|----------|-------|------------|---------|-------|
-| **OpenRouter** | `nvidia/nemotron-3-ultra:free` | 5 RPM | ดีที่สุดสำหรับ Hermes | [openrouter.ai](https://openrouter.ai) |
-| **OpenRouter** | `google/gemma-3-31b-it:free` | 20 RPM | เร็ว context 262K | [openrouter.ai](https://openrouter.ai) |
-| **Google AI Studio** | `gemini-2.5-flash` | 60 RPM | เร็วมาก 1M context | [aistudio.google.com](https://aistudio.google.com) |
-| **Groq** | `llama-3.3-70b-versatile` | 30 RPM | เร็วที่สุด | [console.groq.com](https://console.groq.com) |
-| **Nous Portal** | `hermes-4-70b` | Free | Nous Research's own | [portal.nousresearch.com](https://portal.nousresearch.com) |
+OKMD AI Playground ให้ใช้ฟรี **23 models** — **quota share กันทั้ง Provider**
+
+### Quota รวมตาม Provider
+
+| Provider | Quota รวม/วัน | Models ใน Provider |
+|----------|--------------|---------------------|
+| **Deepseek** | **1,000,000** | `deepseek-v4-pro`, `deepseek-v4-flash` |
+| **OpenAI** | 350,000 | `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.4-nano` |
+| **Gemini** | 200,000 | `gemini-3.5-flash`, `gemini-3.1-flash-lite`, `gemini-2.5-flash-lite` + อื่นๆ |
+| **Meta AI** | 200,000 | `llama-4-maverick`, `llama-4-scout` |
+| **Nova (AWS)** | 200,000 | `nova-pro-v1`, `nova-2-lite-v1` |
+| **Claude** | 180,000 | `claude-sonnet-5`, `claude-sonnet-4.6` |
+| **xAI** | 100,000 | `grok-4.3` |
+| **Perplexity** | 100,000 | `sonar-pro` |
+| **Qwen** | 100,000 | `qwen3.7-plus`, `qwen3.7-max`, `qwen3.6-flash` |
+| **Mistral** | 100,000 | `mistral-medium-3.1` |
+
+### ⚠️ ข้อควรระวังเรื่อง Quota
+
+- **Quota share กันทั้ง Provider** — ใช้ `gpt-5.4` ไป 100K → `gpt-5.4-mini` เหลือแค่ 250K
+- **ใช้ chat ที่ web playground.okmd.or.th ก็หัก quota ด้วย**
+- เช็ค quota: ดูที่ **Usage** ใน OKMD Playground
+
+### Models ที่แนะนำ
+
+| Model | Provider | จุดเด่น |
+|-------|----------|---------|
+| `deepseek-v4-flash` | Deepseek | **Quota เยอะสุด 1M!** |
+| `gpt-5.4-mini` | OpenAI | สมดุลดี ฉลาด+เร็ว |
+| `llama-4-maverick` | Meta AI | Opensource, ฉลาด |
+| `claude-sonnet-5` | Claude | งานซับซ้อน, เขียนโค้ด |
+
+สมัคร: [playground.okmd.or.th](https://playground.okmd.or.th) (ฟรีสำหรับสมาชิก TK Park)
 
 ---
 

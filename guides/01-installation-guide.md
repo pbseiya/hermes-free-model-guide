@@ -1,6 +1,6 @@
 # คู่มือติดตั้ง Hermes Agent + OKMD Free Model
 
-คู่มือฉบับเต็มสำหรับการติดตั้ง Hermes Agent และตั้งค่าใช้ OKMD AI Playground (ฟรี 200K tokens/day)
+คู่มือฉบับเต็มสำหรับการติดตั้ง Hermes Agent และตั้งค่าใช้ OKMD AI Playground (ฟรีสูงสุด 1M tokens/day)
 
 ---
 
@@ -92,7 +92,14 @@ chmod +x install-linux.sh
 
 ## สมัคร OKMD API Key
 
-OKMD AI Playground ให้ใช้ AI ฟรี 200,000 tokens/day จากภาครัฐไทย
+OKMD AI Playground ให้ใช้ AI ฟรี **สูงสุด 1,000,000 tokens/day** (ขึ้นอยู่กับ provider)
+
+Quota เป็น **ราย Provider** (ไม่ใช่ราย model):
+- Deepseek: 1,000,000 tokens/day
+- OpenAI: 350,000 tokens/day  
+- Gemini/Meta AI/Nova: 200,000 tokens/day
+- Claude: 180,000 tokens/day
+- xAI/Qwen/Mistral: 100,000 tokens/day
 
 ### ขั้นตอน
 
@@ -302,7 +309,9 @@ tail ~/.hermes/logs/gateway.log
 
 ### ❌ Quota หมด
 
-OKMD ให้ 200K tokens/day ถ้าหมดต้องรอ reset วันถัดไป
+เช็ค quota ที่เหลือได้จาก `hermes insights` หรือ response ของ API
+
+**หมายเหตุ:** Quota เป็นราย Provider ใช้ `gpt-5.4` 100K → `gpt-5.4-mini` เหลือ 250K (ไม่ใช่ได้คนละ 350K)
 
 เช็ค quota:
 

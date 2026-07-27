@@ -7,9 +7,9 @@
 # Model Configuration
 # =============================================================================
 model:
-  # OKMD AI Playground (Free 200K tokens/day)
+  # OKMD AI Playground (Free 23 models, สูงสุด 1M tokens/day)
   provider: custom:okmd
-  default: gemini-3.5-flash
+  default: gpt-5.4-mini
 
   # Alternative: OpenRouter (free models)
   # provider: openrouter

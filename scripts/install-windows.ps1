@@ -159,7 +159,7 @@ if (-not [string]::IsNullOrWhiteSpace($OKMDKey)) {
 
 model:
   provider: custom:okmd
-  default: gemini-3.5-flash
+  default: gpt-5.4-mini
 
 providers:
   okmd:
@@ -191,8 +191,8 @@ NODE_TLS_REJECT_UNAUTHORIZED=0
     
     Write-Host ""
     Write-Ok "OKMD configuration complete!"
-    Write-Info "Default model: gemini-3.5-flash"
-    Write-Info "Free quota: 200,000 tokens/day"
+    Write-Info "Default model: gpt-5.4-mini (350K tokens/day)"
+    Write-Info "DeepSeek V4 Flash: 1M tokens/day (quota เยอะสุด)"
 } else {
     Write-Warn "Skipping OKMD setup — you can configure later with: hermes setup"
 }

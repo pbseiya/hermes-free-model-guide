@@ -1,0 +1,79 @@
+# Hermes Agent Configuration Template
+# ====================================
+# Copy this file to ~/.hermes/config.yaml and edit as needed
+# DO NOT put API keys here — use .env instead!
+
+# =============================================================================
+# Model Configuration
+# =============================================================================
+model:
+  # OKMD AI Playground (Free 200K tokens/day)
+  provider: custom:okmd
+  default: gemini-3.5-flash
+
+  # Alternative: OpenRouter (free models)
+  # provider: openrouter
+  # default: nvidia/nemotron-3-ultra:free
+
+  # Alternative: Google Gemini (free tier)
+  # provider: google
+  # default: gemini-2.5-flash
+
+# =============================================================================
+# Provider Configuration
+# =============================================================================
+providers:
+  # OKMD AI Playground (Free — Thai government service)
+  okmd:
+    base_url: https://gen.ai.kku.ac.th/okmd/api/v1
+    key_env: OKMD_API_KEY
+    transport: openai_chat
+
+  # OpenRouter (27+ free models)
+  # openrouter:
+  #   base_url: https://openrouter.ai/api/v1
+  #   key_env: OPENROUTER_API_KEY
+
+  # Google AI Studio (free tier)
+  # google:
+  #   base_url: https://generativelanguage.googleapis.com/v1beta
+  #   key_env: GOOGLE_API_KEY
+
+  # Groq (fast inference)
+  # groq:
+  #   base_url: https://api.groq.com/openai/v1
+  #   key_env: GROQ_API_KEY
+
+# =============================================================================
+# Telegram Gateway
+# =============================================================================
+telegram:
+  reactions: true
+
+# =============================================================================
+# Agent Settings
+# =============================================================================
+agent:
+  max_turns: 90
+  tool_use_enforcement: true
+
+# =============================================================================
+# Terminal
+# =============================================================================
+terminal:
+  backend: local
+  timeout: 180
+
+# =============================================================================
+# Memory
+# =============================================================================
+memory:
+  memory_enabled: true
+  user_profile_enabled: true
+
+# =============================================================================
+# Display
+# =============================================================================
+display:
+  show_reasoning: false
+  show_cost: true

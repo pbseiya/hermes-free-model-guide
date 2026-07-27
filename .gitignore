@@ -1,0 +1,33 @@
+# Secrets & credentials — NEVER commit
+.env
+.env.local
+*.key
+*.pem
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Marp output (render on-the-fly, don't commit)
+slides/*.pdf
+slides/*.pptx
+slides/*.html
+
+# Logs
+*.log

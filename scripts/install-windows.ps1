@@ -209,14 +209,21 @@ NODE_TLS_REJECT_UNAUTHORIZED=0
 }
 
 # =============================================================================
-# Step 6: Telegram Bot Token (Optional)
+# Step 5: Telegram Bot Configuration
 # =============================================================================
-Write-Step "Step 6: Telegram Bot (Optional)"
+Write-Step "Step 5: Telegram Bot Configuration"
 
 Write-Host ""
-Write-Host "  สร้าง Telegram Bot:" -ForegroundColor White
+Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "║   Telegram Bot Setup                                     ║" -ForegroundColor Cyan
+Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "  📱 สร้าง Telegram Bot:" -ForegroundColor White
 Write-Host "  1. เปิด Telegram → ค้นหา @BotFather" -ForegroundColor White
-Write-Host "  2. ส่ง /newbot → ตั้งชื่อ → Copy token" -ForegroundColor White
+Write-Host "  2. ส่งคำสั่ง /newbot" -ForegroundColor White
+Write-Host "  3. ตั้งชื่อ Bot (เช่น My Hermes Bot)" -ForegroundColor White
+Write-Host "  4. ตั้ง username (ต้องลงท้ายด้วย bot เช่น my_hermes_bot)" -ForegroundColor White
+Write-Host "  5. Copy Bot Token ที่ BotFather ให้ (รูปแบบ: 123456789:ABCdef...)" -ForegroundColor White
 Write-Host ""
 
 if ([string]::IsNullOrWhiteSpace($TelegramToken)) {
@@ -225,23 +232,38 @@ if ([string]::IsNullOrWhiteSpace($TelegramToken)) {
 
 if (-not [string]::IsNullOrWhiteSpace($TelegramToken)) {
     Write-Host ""
-    Write-Info "หา Telegram User ID ของคุณ..."
-    Write-Host "  เปิด Telegram → ค้นหา @userinfobot → ส่ง /start" -ForegroundColor White
-    Write-Host "  Copy เลข ID ที่ได้" -ForegroundColor White
+    Write-Host "  🔍 หา Telegram Chat ID ของคุณ:" -ForegroundColor White
+    Write-Host "  1. เปิด Telegram → ค้นหา @userinfobot" -ForegroundColor White
+    Write-Host "  2. ส่งคำสั่ง /start" -ForegroundColor White
+    Write-Host "  3. Bot จะตอบกลับด้วย Chat ID ของคุณ (เป็นตัวเลข เช่น 123456789)" -ForegroundColor White
+    Write-Host "  4. Copy Chat ID นั้น" -ForegroundColor White
+    Write-Host ""
+    Write-Host "  ⚠️  Chat ID ใช้สำหรับ:" -ForegroundColor Yellow
+    Write-Host "     - อนุญาตให้เฉพาะคุณที่คุยกับ Bot ได้" -ForegroundColor Yellow
+    Write-Host "     - ป้องกันคนอื่นใช้ Bot ของคุณ" -ForegroundColor Yellow
     Write-Host ""
     
-    $TgUserId = Read-Host "วาง Telegram User ID"
+    $TgUserId = Read-Host "วาง Telegram Chat ID (หรือกด Enter เพื่อข้าม)"
     
     $envPath = Join-Path $HermesHome ".env"
     $tgContent = @"
 
 # Telegram Bot
 TELEGRAM_BOT_TOKEN=$TelegramToken
-TELEGRAM_ALLOWED_USERS=$TgUserId
 "@
     
+    if (-not [string]::IsNullOrWhiteSpace($TgUserId)) {
+        $tgContent += @"
+TELEGRAM_ALLOWED_USERS=$TgUserId
+"@
+        Write-Ok "Telegram configuration added (Bot Token + Chat ID)"
+    } else {
+        Write-Warn "No Chat ID provided - Bot will be accessible to anyone"
+    }
+    
     Add-Content -Path $envPath -Value $tgContent -Encoding UTF8
-    Write-Ok "Telegram configuration added"
+} else {
+    Write-Warn "Skipping Telegram setup — you can configure later with: hermes gateway setup"
 }
 
 # =============================================================================

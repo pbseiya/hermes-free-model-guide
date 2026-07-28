@@ -178,35 +178,55 @@ else
 fi
 
 # =============================================================================
-# Step 5: Telegram Bot Token (Optional)
+# Step 5: Telegram Bot Configuration
 # =============================================================================
-step "Step 5: Telegram Bot (Optional)"
+step "Step 5: Telegram Bot Configuration"
 
 echo ""
-echo "  สร้าง Telegram Bot:"
+echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${CYAN}║   Telegram Bot Setup                                     ║${NC}"
+echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
+echo ""
+echo "  📱 สร้าง Telegram Bot:"
 echo "  1. เปิด Telegram → ค้นหา @BotFather"
-echo "  2. ส่ง /newbot → ตั้งชื่อ → Copy token"
+echo "  2. ส่งคำสั่ง /newbot"
+echo "  3. ตั้งชื่อ Bot (เช่น My Hermes Bot)"
+echo "  4. ตั้ง username (ต้องลงท้ายด้วย bot เช่น my_hermes_bot)"
+echo "  5. Copy Bot Token ที่ BotFather ให้ (รูปแบบ: 123456789:ABCdef...)"
 echo ""
 
 read -p "วาง Telegram Bot Token (หรือกด Enter เพื่อข้าม): " TG_TOKEN
 
 if [ -n "$TG_TOKEN" ]; then
-    # Get Telegram User ID
     echo ""
-    info "หา Telegram User ID ของคุณ..."
-    echo "  เปิด Telegram → ค้นหา @userinfobot → ส่ง /start"
-    echo "  Copy เลข ID ที่ได้"
+    echo "  🔍 หา Telegram Chat ID ของคุณ:"
+    echo "  1. เปิด Telegram → ค้นหา @userinfobot"
+    echo "  2. ส่งคำสั่ง /start"
+    echo "  3. Bot จะตอบกลับด้วย Chat ID ของคุณ (เป็นตัวเลข เช่น 123456789)"
+    echo "  4. Copy Chat ID นั้น"
     echo ""
-    read -p "วาง Telegram User ID: " TG_USER_ID
-
+    echo -e "  ${YELLOW}⚠️  Chat ID ใช้สำหรับ:${NC}"
+    echo -e "  ${YELLOW}   - อนุญาตให้เฉพาะคุณที่คุยกับ Bot ได้${NC}"
+    echo -e "  ${YELLOW}   - ป้องกันคนอื่นใช้ Bot ของคุณ${NC}"
+    echo ""
+    
+    read -p "วาง Telegram Chat ID (หรือกด Enter เพื่อข้าม): " TG_USER_ID
+    
     # Append to .env
     cat >> "$HERMES_HOME/.env" << EOF
 
 # Telegram Bot
 TELEGRAM_BOT_TOKEN=${TG_TOKEN}
-TELEGRAM_ALLOWED_USERS=${TG_USER_ID:-*}
 EOF
-    ok "Telegram configuration added"
+    
+    if [ -n "$TG_USER_ID" ]; then
+        echo "TELEGRAM_ALLOWED_USERS=${TG_USER_ID}" >> "$HERMES_HOME/.env"
+        ok "Telegram configuration added (Bot Token + Chat ID)"
+    else
+        warn "No Chat ID provided - Bot will be accessible to anyone"
+    fi
+else
+    warn "Skipping Telegram setup — you can configure later with: hermes gateway setup"
 fi
 
 # =============================================================================

@@ -178,6 +178,66 @@ else
 fi
 
 # =============================================================================
+# Step 5: Configure LiteLLM Proxy (Course 0)
+# =============================================================================
+step "Step 5: Configure LiteLLM Proxy (Optional - Course 0)"
+
+echo ""
+echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${CYAN}║   LiteLLM Proxy Configuration (Course 0)                ║${NC}"
+echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
+echo ""
+echo "  LiteLLM Proxy สำหรับ Course 0 (TPA Training)"
+echo "  - Default model: qwen3.7-plus"
+echo "  - Hosted on Cloudflare Workers"
+echo "  - ไม่ต้องติดตั้ง LiteLLM เอง"
+echo ""
+echo "  ผู้เรียน Course 0 จะได้รับ API Key จาก instructor"
+echo "  ถ้าไม่แน่ใจ → กด Enter เพื่อข้าม"
+echo ""
+
+read -p "วาง LiteLLM API Key (หรือกด Enter เพื่อข้าม): " LITELLM_KEY
+
+if [ -n "$LITELLM_KEY" ]; then
+    # Append to .env
+    cat >> "$HERMES_HOME/.env" << EOF
+
+# LiteLLM Proxy (Course 0)
+LITELLM_API_KEY=${LITELLM_KEY}
+EOF
+    
+    # Update config.yaml to use LiteLLM instead of OKMD
+    cat > "$HERMES_HOME/config.yaml" << 'EOF'
+# Hermes Agent Configuration
+# Using LiteLLM Proxy as model provider (Course 0)
+
+model:
+  provider: custom:litellm
+  default: qwen3.7-plus
+
+custom_providers:
+  - name: litellm
+    base_url: https://litellm-proxy-gateway.pbseiyacpro7.workers.dev/v1
+    key_env: LITELLM_API_KEY
+
+# Also keep OKMD configuration for switching
+  - name: okmd
+    base_url: https://gen.ai.kku.ac.th/okmd/api/v1
+    key_env: OKMD_API_KEY
+
+# Telegram Gateway
+telegram:
+  reactions: true
+EOF
+    
+    ok "LiteLLM configuration complete!"
+    info "Default model: qwen3.7-plus (via LiteLLM Proxy)"
+    info "Switch to OKMD: hermes config set model.provider custom:okmd"
+else
+    info "Skipping LiteLLM setup - Using OKMD as default"
+fi
+
+# =============================================================================
 # Step 5: Telegram Bot Configuration
 # =============================================================================
 step "Step 5: Telegram Bot Configuration"

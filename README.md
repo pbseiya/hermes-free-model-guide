@@ -11,8 +11,8 @@
 | ✅ | เป้าหมาย |
 |----|-----------|
 | 1 | ติดตั้ง Hermes Agent ได้สำเร็จ (ไม่ต้อง admin/sudo) |
-| 2 | สร้าง API Key ฟรี (OpenRouter / Google Gemini / Groq) |
-| 3 | ตั้งค่า Hermes ให้ใช้ Free Model |
+| 2 | สร้าง API Key ฟรีจาก OKMD AI Playground (สูงสุด 1M tokens/day) |
+| 3 | ตั้งค่า Hermes ให้ใช้ Free Model (OKMD / LiteLLM / OpenRouter) |
 | 4 | สร้าง Telegram Bot และเชื่อมกับ Hermes |
 | 5 | ทดสอบใช้งานจริงได้ |
 
@@ -37,6 +37,7 @@ curl -fsSL https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/mai
 ```
 hermes-free-model-guide/
 ├── README.md                    # ไฟล์นี้
+├── LICENSE                      # MIT License
 ├── SECURITY.md                  # นโยบายความปลอดภัย (ห้าม commit credentials)
 ├── .gitignore                   # ป้องกัน credential รั่ว
 ├── slides/
@@ -48,14 +49,11 @@ hermes-free-model-guide/
 │   ├── uninstall-windows.ps1    # Windows uninstaller
 │   └── uninstall-linux.sh       # Linux/macOS uninstaller
 ├── guides/
-│   ├── 01-what-is-hermes.md     # Hermes คืออะไร?
-│   ├── 02-installation.md       # คู่มือติดตั้ง 3 OS
-│   ├── 03-free-models.md        # เปรียบเทียบ Free Models
-│   ├── 04-config.md             # ตั้งค่า Hermes + Free Model
-│   ├── 05-telegram.md           # สร้าง Telegram Bot
-│   └── 06-troubleshooting.md    # แก้ปัญหาที่พบบ่อย
+│   ├── 01-installation-guide.md # คู่มือติดตั้ง 3 OS
+│   └── 02-change-provider.md    # คู่มือเปลี่ยน Provider + API Key
 └── templates/
-    └── config.yaml              # ตัวอย่าง config (placeholder — ไม่มี key จริง)
+    ├── config.yaml              # ตัวอย่าง config (placeholder — ไม่มี key จริง)
+    └── env.example              # ตัวอย่าง .env file
 ```
 
 ---
@@ -91,11 +89,11 @@ curl -fsSL https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/mai
 
 ---
 
-## 🔑 Free Models ที่แนะนำ (อัปเดต Jul 2026)
+## 🔑 Free Models ที่แนะนำ
 
-OKMD AI Playground ให้ใช้ฟรี **23 models** — **quota share กันทั้ง Provider**
+### OKMD AI Playground (แนะนำ)
 
-### Quota รวมตาม Provider
+OKMD ให้ใช้ฟรี **23 models** — **quota share กันทั้ง Provider**
 
 | Provider | Quota รวม/วัน | Models ใน Provider |
 |----------|--------------|---------------------|
@@ -110,27 +108,36 @@ OKMD AI Playground ให้ใช้ฟรี **23 models** — **quota share �
 | **Qwen** | 100,000 | `qwen3.7-plus`, `qwen3.7-max`, `qwen3.6-flash` |
 | **Mistral** | 100,000 | `mistral-medium-3.1` |
 
-### ⚠️ ข้อควรระวังเรื่อง Quota
+**สมัคร:** [playground.okmd.or.th](https://playground.okmd.or.th) (ฟรีสำหรับสมาชิก TK Park)
 
-- **Quota share กันทั้ง Provider** — ใช้ `gpt-5.4` ไป 100K → `gpt-5.4-mini` เหลือแค่ 250K
-- **ใช้ chat ที่ web playground.okmd.or.th ก็หัก quota ด้วย**
-- เช็ค quota: ดูที่ **Usage** ใน OKMD Playground
+### LiteLLM Proxy
+
+**Course 0** ใช้ LiteLLM Proxy ที่ host บน Cloudflare Workers:
+- Default model: `qwen3.7-plus`
+- ไม่ต้องติดตั้ง LiteLLM เอง
+- ใส่ API Key ที่ instructor ให้มาก็ใช้ได้ทันที
+
+ดูรายละเอียดเพิ่มเติม: [guides/02-change-provider.md](guides/02-change-provider.md)
 
 ### Models ที่แนะนำ
 
 | Model | Provider | จุดเด่น |
 |-------|----------|---------|
-| `deepseek-v4-flash` | Deepseek | **Quota เยอะสุด 1M!** |
-| `gpt-5.4-mini` | OpenAI | สมดุลดี ฉลาด+เร็ว |
-| `llama-4-maverick` | Meta AI | Opensource, ฉลาด |
-| `claude-sonnet-5` | Claude | งานซับซ้อน, เขียนโค้ด |
-
-สมัคร: [playground.okmd.or.th](https://playground.okmd.or.th) (ฟรีสำหรับสมาชิก TK Park)
+| `deepseek-v4-flash` | OKMD (Deepseek) | **Quota เยอะสุด 1M!** |
+| `gpt-5.4-mini` | OKMD (OpenAI) | สมดุลดี ฉลาด+เร็ว |
+| `qwen3.7-plus` | LiteLLM | Course 0 default |
+| `llama-4-maverick` | OKMD (Meta AI) | Opensource, ฉลาด |
+| `claude-sonnet-5` | OKMD (Claude) | งานซับซ้อน, เขียนโค้ด |
 
 ---
 
-## 📖 ดู Slides
+## 📖 คู่มือและเอกสาร
 
+### Guides
+- [01-installation-guide.md](guides/01-installation-guide.md) - คู่มือติดตั้ง 3 OS
+- [02-change-provider.md](guides/02-change-provider.md) - คู่มือเปลี่ยน Provider + API Key (OKMD, LiteLLM, OpenRouter)
+
+### Slides
 ```bash
 # Render เป็น HTML (เปิดดูใน browser ได้เลย)
 npx @marp-team/marp-cli slides/slides.md --html
@@ -146,6 +153,27 @@ npx @marp-team/marp-cli slides/slides.md -s
 
 ---
 
+## ⚙️ Installation Scripts Features
+
+### Install Scripts ทำอะไร?
+
+1. ✅ ติดตั้ง Hermes Agent (user-space, ไม่ต้อง admin)
+2. ✅ ติดตั้ง Antigravity CLI (agy) — Gemini free via Google Account
+3. ✅ ตั้งค่า OKMD AI Playground (ถาม API Key ตอนติดตั้ง)
+4. ✅ ตั้งค่า Telegram Bot (ถาม Bot Token + Chat ID)
+5. ✅ ตั้งค่า PATH ให้เรียก `hermes`, `agy` จากทุกโฟลเดอร์
+6. ✅ ตั้งค่า auto-start services (Desktop, Dashboard, Telegram)
+
+### Auto-start Services หลัง Reboot
+
+| OS | Services | Method |
+|----|----------|--------|
+| **Windows** | Telegram, Dashboard, Desktop | Task Scheduler / Startup Folder |
+| **Linux** | Telegram, Dashboard, Desktop | systemd user services |
+| **macOS** | Telegram, Dashboard, Desktop | launchd agents |
+
+---
+
 ## ⚠️ คำเตือนเรื่อง Security
 
 **ห้าม** commit API keys, tokens, หรือ credentials ขึ้น repo เด็ดขาด!
@@ -153,19 +181,27 @@ npx @marp-team/marp-cli slides/slides.md -s
 - ใส่ `.env` ใน `.gitignore` (done ✅)
 - ใช้ placeholder ในเอกสาร: `YOUR_API_KEY_HERE`
 - ตรวจสอบ `SECURITY.md` ก่อน commit
+- Installation scripts ไม่เก็บ API key ใน git
 
 ---
 
 ## 📚 อ้างอิง
 
 - [Hermes Agent Docs](https://hermes-agent.nousresearch.com/docs/)
+- [OKMD AI Playground](https://playground.okmd.or.th)
+- [LiteLLM Proxy](https://docs.litellm.ai/)
 - [OpenRouter Free Models](https://openrouter.ai/models?q=free)
-- [Google AI Studio](https://aistudio.google.com)
-- [Groq Console](https://console.groq.com)
 - [Inspired by: Medium Article by Ausada — OpenClaw กับ OKMD AI Playground](https://medium.com/@ausada)
 
 ---
 
-**License:** MIT
-**Author:** Hermes Agent Training Team
-**Last Updated:** 2026-07-27
+## 🤝 Contributing
+
+ดู [SECURITY.md](SECURITY.md) สำหรับนโยบายความปลอดภัย
+
+---
+
+**License:** MIT  
+**Author:** Hermes Agent Training Team  
+**Last Updated:** 2026-01-26  
+**Version:** 1.0.0

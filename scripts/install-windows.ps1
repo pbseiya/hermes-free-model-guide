@@ -209,6 +209,70 @@ NODE_TLS_REJECT_UNAUTHORIZED=0
 }
 
 # =============================================================================
+# Step 6: Configure LiteLLM Proxy (Course 0)
+# =============================================================================
+Write-Step "Step 6: Configure LiteLLM Proxy (Optional - Course 0)"
+
+Write-Host ""
+Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "║   LiteLLM Proxy Configuration (Course 0)                ║" -ForegroundColor Cyan
+Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "  LiteLLM Proxy สำหรับ Course 0 (TPA Training)" -ForegroundColor White
+Write-Host "  - Default model: qwen3.7-plus" -ForegroundColor White
+Write-Host "  - Hosted on Cloudflare Workers" -ForegroundColor White
+Write-Host "  - ไม่ต้องติดตั้ง LiteLLM เอง" -ForegroundColor White
+Write-Host ""
+Write-Host "  ผู้เรียน Course 0 จะได้รับ API Key จาก instructor" -ForegroundColor White
+Write-Host "  ถ้าไม่แน่ใจ → กด Enter เพื่อข้าม" -ForegroundColor White
+Write-Host ""
+
+$LiteLLMKey = Read-Host "วาง LiteLLM API Key (หรือกด Enter เพื่อข้าม)"
+
+if (-not [string]::IsNullOrWhiteSpace($LiteLLMKey)) {
+    # Append to .env
+    $litellmEnvContent = @"
+
+# LiteLLM Proxy (Course 0)
+LITELLM_API_KEY=$LiteLLMKey
+"@
+    Add-Content -Path $envPath -Value $litellmEnvContent -Encoding UTF8
+    
+    # Update config.yaml to use LiteLLM instead of OKMD
+    $configContent = @"
+# Hermes Agent Configuration
+# Using LiteLLM Proxy as model provider (Course 0)
+
+model:
+  provider: custom:litellm
+  default: qwen3.7-plus
+
+custom_providers:
+  - name: litellm
+    base_url: https://litellm-proxy-gateway.pbseiyacpro7.workers.dev/v1
+    key_env: LITELLM_API_KEY
+
+# Also keep OKMD configuration for switching
+  - name: okmd
+    base_url: https://gen.ai.kku.ac.th/okmd/api/v1
+    key_env: OKMD_API_KEY
+
+# Telegram Gateway
+telegram:
+  reactions: true
+"@
+    
+    $configPath = Join-Path $HermesHome "config.yaml"
+    Set-Content -Path $configPath -Value $configContent -Encoding UTF8
+    
+    Write-Ok "LiteLLM configuration complete!"
+    Write-Info "Default model: qwen3.7-plus (via LiteLLM Proxy)"
+    Write-Info "Switch to OKMD: hermes config set model.provider custom:okmd"
+} else {
+    Write-Info "Skipping LiteLLM setup - Using OKMD as default"
+}
+
+# =============================================================================
 # Step 5: Telegram Bot Configuration
 # =============================================================================
 Write-Step "Step 5: Telegram Bot Configuration"

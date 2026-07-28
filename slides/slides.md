@@ -677,11 +677,50 @@ TOGETHER_API_KEY=your-together-key
 - รองรับ 100+ models (OpenAI, Anthropic, Gemini, Bedrock, Azure)
 - Load balancing, fallback, retry อัตโนมัติ
 - Rate limit management
-- Self-host ได้ (Docker, Python)
+- มี 2 รูปแบบ: **Hosted** (Cloud) และ **Self-host**
 
-### ติดตั้ง LiteLLM
+### LiteLLM มี 2 รูปแบบ
 
-**วิธีที่ 1: Docker (แนะนำ)**
+| รูปแบบ | คำอธิบาย | เหมาะกับ |
+|--------|----------|----------|
+| **Hosted** (Cloud) | ใช้ proxy ที่คนอื่น host ให้ | ผู้เรียน Course 0 |
+| **Self-host** | ติดตั้งเอง (Docker/Python) | Advanced users |
+
+---
+
+### 🌐 LiteLLM Hosted (แนะนำสำหรับ Course 0)
+
+Course 0 ใช้ LiteLLM Proxy ที่ host บน Cloudflare Workers ผู้เรียน **ไม่ต้องติดตั้ง LiteLLM เอง** แค่ใส่ API Key ที่ instructor ให้มาก็ใช้ได้ทันที
+
+**Configuration (Course 0):**
+
+```yaml
+# ~/.hermes/config.yaml
+model:
+  provider: custom:litellm
+  default: qwen3.7-plus
+
+providers:
+  litellm:
+    base_url: https://litellm-proxy-gateway.pbseiyacpro7.workers.dev/v1
+    key_env: LITELLM_API_KEY
+    transport: openai_chat
+```
+
+**API Key ใน `.env`:**
+
+```bash
+# ~/.hermes/.env
+LITELLM_API_KEY=sk-hd_VaSiHUSu_RqHKwHs7aw
+```
+
+> ⚠️ **หมายเหตุ:** API Key ด้านบนเป็นตัวอย่างสำหรับ Course 0 ผู้เรียนจะได้รับ key จาก instructor
+
+---
+
+### 🔧 LiteLLM Self-host (สำหรับ Advanced Users)
+
+#### ติดตั้ง LiteLLM ด้วย Docker
 
 ```bash
 docker run -d \
@@ -693,7 +732,7 @@ docker run -d \
   ghcr.io/berriai/litellm:main-latest
 ```
 
-**วิธีที่ 2: Python**
+#### ติดตั้ง LiteLLM ด้วย Python
 
 ```bash
 pip install litellm[proxy]
@@ -716,7 +755,7 @@ EOF
 litellm --config litellm_config.yaml --port 4000
 ```
 
-### ตั้งค่า LiteLLM ใน Hermes
+### ตั้งค่า LiteLLM Self-host ใน Hermes
 
 **วิธีที่ 1: ใช้ `hermes model`**
 
@@ -744,9 +783,11 @@ model:
   provider: custom:litellm
 ```
 
-### ตัวอย่าง LiteLLM Config
+---
 
-**หลาย Providers:**
+### ตัวอย่าง LiteLLM Config (Self-host)
+
+#### หลาย Providers:
 
 ```yaml
 # litellm_config.yaml
@@ -767,7 +808,7 @@ model_list:
       api_key: os.environ/GEMINI_API_KEY
 ```
 
-**Load Balancing:**
+#### Load Balancing:
 
 ```yaml
 model_list:
@@ -786,7 +827,7 @@ router_settings:
   num_retries: 3
 ```
 
-**Fallback:**
+#### Fallback:
 
 ```yaml
 router_settings:
@@ -794,6 +835,33 @@ router_settings:
     - default: ["default-fallback"]
   num_retries: 3
 ```
+
+---
+
+### เปลี่ยน Model ใน Hermes
+
+```bash
+/model custom:litellm/gpt-4o
+/model custom:litellm/claude-3.5-sonnet
+/model custom:litellm/gemini-2.0-flash
+```
+
+### Fallback Configuration ใน Hermes
+
+นอกจาก LiteLLM จะรองรับ fallback ได้แล้ว Hermes ก็รองรับการตั้งค่า fallback ระดับ provider ได้เช่นกัน:
+
+```yaml
+# ~/.hermes/config.yaml
+model:
+  default: qwen3.7-plus
+  fallbacks:
+    - anthropic/claude-sonnet-4
+    - openai/gpt-4o
+```
+
+เมื่อ model หลัก (qwen3.7-plus) ไม่ตอบสนอง Hermes จะลองใช้ model ถัดไปโดยอัตโนมัติ
+
+---
 
 ### ข้อดีของ LiteLLM
 
@@ -805,13 +873,56 @@ router_settings:
 | **Rate limit management** | จัดการ rate limit อัตโนมัติ |
 | **Cost tracking** | ติดตามค่าใช้จ่าย |
 
-### เปลี่ยน Model ใน Hermes
+### เปรียบเทียบ LiteLLM Hosted vs Self-host
+
+| หัวข้อ | Hosted (Course 0) | Self-host |
+|--------|-------------------|-----------|
+| **การติดตั้ง** | ไม่ต้องติดตั้ง | ต้องติดตั้ง Docker/Python |
+| **การดูแล** | Instructor ดูแลให้ | ดูแลเอง |
+| **ความยืดหยุ่น** | จำกัดตาม provider ที่ instructor ให้ | ควบคุมได้เองทั้งหมด |
+| **ค่าใช้จ่าย** | ฟรี (รวมใน Course) | จ่ายค่า API keys เอง |
+| **เหมาะกับ** | ผู้เรียน, beginners | Advanced users, องค์กร |
+
+---
+
+### Troubleshooting LiteLLM
+
+**ปัญหา: "Connection refused"**
 
 ```bash
-/model custom:litellm/gpt-4o
-/model custom:litellm/claude-3.5-sonnet
-/model custom:litellm/gemini-2.0-flash
+# สำหรับ Self-host: ตรวจสอบว่า LiteLLM ทำงานอยู่
+curl http://localhost:4000/health
+
+# สำหรับ Hosted: ตรวจสอบ internet connection
+curl https://litellm-proxy-gateway.pbseiyacpro7.workers.dev/health
 ```
+
+**ปัญหา: "Model not found"**
+
+```bash
+# ดู models ที่มี
+curl http://localhost:4000/models
+
+# หรือสำหรับ Hosted
+curl https://litellm-proxy-gateway.pbseiyacpro7.workers.dev/models \
+  -H "Authorization: Bearer $LITELLM_API_KEY"
+```
+
+**ปัญหา: "Invalid API key"**
+
+```bash
+# ตรวจสอบ API key ใน .env
+cat ~/.hermes/.env | grep LITELLM
+
+# ตั้ง API key ใหม่
+hermes env set LITELLM_API_KEY sk-correct-key
+```
+
+**ปัญหา: "401 Unauthorized" (Course 0)**
+
+- ตรวจสอบว่าใช้ API Key ที่ instructor ให้มาถูกต้อง
+- API Key อาจหมดอายุ → ติดต่อ instructor
+- ตรวจสอบว่าไม่มีช่องว่างหรือ newline ใน key
 
 ---
 

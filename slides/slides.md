@@ -387,6 +387,13 @@ curl -sk https://gen.ai.kku.ac.th/okmd/api/v1/models \
 
 # 🔄 เปลี่ยน Model Provider
 
+<div class="warning">
+
+**⚠️ สำคัญ:** `hermes setup` **ไม่ถาม API key สำหรับ custom provider**
+ต้องใช้ `hermes model` หรือแก้ `config.yaml` โดยตรง
+
+</div>
+
 ## เปลี่ยนจาก OKMD เป็น Provider อื่น
 
 ### วิธีที่ 1: ใช้ hermes model (แนะนำ)
@@ -401,15 +408,51 @@ hermes model
 - Anthropic (Claude 3.5, Claude 3)
 - Google (Gemini)
 - Groq (เร็วมาก)
-- custom:okmd (OKMD AI Playground)
+- **Custom endpoint** (สำหรับ OKMD, Ollama, vLLM, ฯลฯ)
 
-### วิธีที่ 2: ใช้คำสั่ง
+**สำหรับ Custom endpoint:**
+1. เลือก "Custom endpoint (self-hosted / VLLM / etc.)"
+2. ใส่ **Base URL** (เช่น `https://gen.ai.kku.ac.th/okmd/api/v1`)
+3. ใส่ **API Key** (เช่น `sk_...`)
+4. ใส่ **Model name** (เช่น `gpt-5.4-mini`)
+
+### วิธีที่ 2: แก้ config.yaml โดยตรง
+
+```bash
+hermes config edit
+```
+
+**เพิ่มส่วน `custom_providers`:**
+
+```yaml
+# ~/.hermes/config.yaml
+custom_providers:
+  - name: okmd
+    base_url: https://gen.ai.kku.ac.th/okmd/api/v1
+    key_env: OKMD_API_KEY
+
+model:
+  default: gpt-5.4-mini
+  provider: custom:okmd
+```
+
+**ตั้ง API Key ใน `.env`:**
+
+```bash
+hermes env edit
+```
+
+```bash
+# ~/.hermes/.env
+OKMD_API_KEY=sk_your_actual_key_here
+```
+
+### วิธีที่ 3: ใช้คำสั่ง
 
 ```bash
 # เปลี่ยนเป็น OpenRouter
 hermes config set model.provider openrouter
 hermes config set model.default anthropic/claude-3.5-sonnet
-hermes config set providers.openrouter.key_env OPENROUTER_API_KEY
 
 # ตั้ง API key
 hermes env set OPENROUTER_API_KEY sk-or-v1-...
@@ -586,16 +629,15 @@ hermes model test custom:okmd
 ### Ollama (Local Model)
 
 ```yaml
-# ใน config.yaml
+# ~/.hermes/config.yaml
+custom_providers:
+  - name: ollama
+    base_url: http://localhost:11434/api
+    key_env: ""
+
 model:
   provider: custom:ollama
   default: llama3.2
-
-providers:
-  ollama:
-    base_url: http://localhost:11434/api
-    key_env: ""
-    transport: ollama
 ```
 
 **ติดตั้ง:**
@@ -605,6 +647,63 @@ ollama pull llama3.2
 ollama serve
 ```
 
+### Together AI
+
+```yaml
+# ~/.hermes/config.yaml
+custom_providers:
+  - name: together
+    base_url: https://api.together.xyz/v1
+    key_env: TOGETHER_API_KEY
+
+model:
+  provider: custom:together
+  default: mistralai/Mixtral-8x7B-Instruct-v0.1
+```
+
+```bash
+# ~/.hermes/.env
+TOGETHER_API_KEY=your-together-key
+```
+
+---
+
+## Troubleshooting
+
+### ปัญหา: `hermes setup` ไม่ถาม API key สำหรับ custom provider
+
+**สาเหตุ:** `hermes setup` เป็น wizard สำหรับ built-in providers เท่านั้น
+
+**วิธีแก้:**
+- ใช้ `hermes model` แทน (ถาม API key สำหรับ custom provider)
+- หรือแก้ `config.yaml` โดยตรง (วิธีที่ 2)
+
+### ปัญหา: "Provider not found"
+
+**สาเหตุ:** ใส่ชื่อ provider ผิด
+
+**วิธีแก้:**
+```bash
+# ดู providers ที่มี
+hermes config get custom_providers
+
+# ใช้ชื่อที่ถูกต้อง
+hermes config set model.provider custom:okmd
+```
+
+### ปัญหา: "Invalid API key"
+
+**สาเหตุ:** API key ผิด หรือไม่ได้ตั้งใน `.env`
+
+**วิธีแก้:**
+```bash
+# ตรวจสอบ API key
+hermes env show
+
+# ตั้ง API key ใหม่
+hermes env set OKMD_API_KEY sk_correct_key
+```
+
 ---
 
 ## สรุปคำสั่งสำคัญ
@@ -612,7 +711,7 @@ ollama serve
 | งาน | คำสั่ง |
 |-----|--------|
 | ดู provider ปัจจุบัน | `hermes config get model` |
-| เปลี่ยน provider | `hermes model` |
+| ตั้งค่า provider/model | `hermes model` |
 | เปลี่ยน provider (quick) | `hermes config set model.provider openrouter` |
 | เปลี่ยน model | `hermes config set model.default claude-3.5-sonnet` |
 | ตั้ง API key | `hermes env set OPENROUTER_API_KEY sk-...` |
@@ -621,6 +720,28 @@ ollama serve
 | แก้ .env | `hermes env edit` |
 | ทดสอบ provider | `hermes model test` |
 | เปลี่ยน model (session) | `/model openrouter/claude-3.5-sonnet` |
+
+---
+
+## สรุป 3 วิธีตั้งค่า Provider
+
+### วิธีที่ 1: `hermes model` (แนะนำ)
+
+- ✅ ถาม API key สำหรับ custom provider
+- ✅ Interactive
+- ✅ บันทึกอัตโนมัติ
+
+### วิธีที่ 2: แก้ `config.yaml` โดยตรง
+
+- ✅ ควบคุมทุกอย่างได้
+- ✅ เหมาะกับ automation
+- ⚠️ ต้องตั้ง API key ใน `.env` เอง
+
+### วิธีที่ 3: `/model` ใน session
+
+- ✅ เร็ว
+- ⚠️ ไม่บันทึกถาวร
+- ⚠️ ใช้ได้เฉพาะ provider ที่มีอยู่แล้ว
 
 ---
 

@@ -385,6 +385,245 @@ curl -sk https://gen.ai.kku.ac.th/okmd/api/v1/models \
 
 ---
 
+# 🔄 เปลี่ยน Model Provider
+
+## เปลี่ยนจาก OKMD เป็น Provider อื่น
+
+### วิธีที่ 1: ใช้ hermes model (แนะนำ)
+
+```bash
+hermes model
+```
+
+**เลือกจากเมนู:**
+- OpenRouter (เข้าถึงหลาย models ด้วย key เดียว)
+- OpenAI (GPT-4, GPT-3.5)
+- Anthropic (Claude 3.5, Claude 3)
+- Google (Gemini)
+- Groq (เร็วมาก)
+- custom:okmd (OKMD AI Playground)
+
+### วิธีที่ 2: ใช้คำสั่ง
+
+```bash
+# เปลี่ยนเป็น OpenRouter
+hermes config set model.provider openrouter
+hermes config set model.default anthropic/claude-3.5-sonnet
+hermes config set providers.openrouter.key_env OPENROUTER_API_KEY
+
+# ตั้ง API key
+hermes env set OPENROUTER_API_KEY sk-or-v1-...
+
+# ตรวจสอบ
+hermes model test openrouter
+```
+
+---
+
+## Built-in Providers
+
+### OpenRouter (แนะนำ)
+
+**ข้อดี:** เข้าถึง model หลายตัวด้วย API key เดียว
+
+```bash
+hermes model
+# เลือก: openrouter
+# เลือก model: anthropic/claude-3.5-sonnet
+# ใส่ API key: sk-or-v1-...
+```
+
+**Models ที่แนะนำ:**
+| Model | ราคา | เหมาะกับ |
+|-------|------|----------|
+| `anthropic/claude-3.5-sonnet` | $3/$15 per 1M | งานทั่วไป |
+| `openai/gpt-4o` | $5/$15 per 1M | สมดุลดี |
+| `google/gemini-2.0-flash-exp` | ฟรี | ทดสอบ |
+| `meta-llama/llama-3.3-70b` | ฟรี | Opensource |
+
+**สมัคร:** https://openrouter.ai/keys
+
+---
+
+### OpenAI (GPT Models)
+
+```bash
+hermes model
+# เลือก: openai
+# เลือก model: gpt-4o, gpt-4-turbo, gpt-3.5-turbo
+# ใส่ API key: sk-...
+```
+
+**Models ที่แนะนำ:**
+| Model | ราคา | เหมาะกับ |
+|-------|------|----------|
+| `gpt-4o` | $5/$15 per 1M | สมดุลดี |
+| `gpt-4-turbo` | $10/$30 per 1M | งานซับซ้อน |
+| `gpt-3.5-turbo` | $0.5/$1.5 per 1M | ถูก, เร็ว |
+
+**สมัคร:** https://platform.openai.com/api-keys
+
+---
+
+### Anthropic (Claude Models)
+
+```bash
+hermes model
+# เลือก: anthropic
+# เลือก model: claude-3.5-sonnet, claude-3-opus, claude-3-haiku
+# ใส่ API key: sk-ant-...
+```
+
+**Models ที่แนะนำ:**
+| Model | ราคา | เหมาะกับ |
+|-------|------|----------|
+| `claude-3.5-sonnet` | $3/$15 per 1M | สมดุลดี |
+| `claude-3-opus` | $15/$75 per 1M | ฉลาดสุด |
+| `claude-3-haiku` | $0.25/$1.25 per 1M | เร็ว, ถูก |
+
+**สมัคร:** https://console.anthropic.com/
+
+---
+
+### Google Gemini
+
+```bash
+hermes model
+# เลือก: google
+# เลือก model: gemini-2.0-flash-exp, gemini-1.5-pro
+# ใส่ API key: AIza...
+```
+
+**Models ที่แนะนำ:**
+| Model | ราคา | เหมาะกับ |
+|-------|------|----------|
+| `gemini-2.0-flash-exp` | ฟรี (ทดลอง) | ทดสอบ |
+| `gemini-1.5-pro` | $1.25/$5 per 1M | งานทั่วไป |
+| `gemini-1.5-flash` | $0.075/$0.30 per 1M | ถูก, เร็ว |
+
+**สมัคร:** https://aistudio.google.com/app/apikey
+
+---
+
+### Groq (เร็วมาก)
+
+```bash
+hermes model
+# เลือก: groq
+# เลือก model: llama-3.3-70b-versatile
+# ใส่ API key: gsk_...
+```
+
+**Models ที่แนะนำ:**
+| Model | ราคา | เหมาะกับ |
+|-------|------|----------|
+| `llama-3.3-70b-versatile` | ฟรี (rate limit) | ทดสอบ |
+| `llama-3.1-8b-instant` | ฟรี (rate limit) | เร็วมาก |
+
+**สมัคร:** https://console.groq.com/keys
+
+---
+
+## เปลี่ยน API Key
+
+### ดู API Key ปัจจุบัน
+
+```bash
+# ดูชื่อ environment variable
+hermes config get providers.okmd.key_env
+
+# ดูค่าปัจจุบัน (masked)
+hermes env show
+```
+
+### เปลี่ยน API Key
+
+```bash
+# วิธีที่ 1: ใช้ hermes env set
+hermes env set OKMD_API_KEY sk_new_key_here
+
+# วิธีที่ 2: แก้ไฟล์ .env โดยตรง
+hermes env edit
+```
+
+### ลบ API Key
+
+```bash
+hermes env unset OKMD_API_KEY
+```
+
+---
+
+## ตรวจสอบการตั้งค่า
+
+### ดู Configuration ทั้งหมด
+
+```bash
+hermes config get
+```
+
+### ดู Environment Variables
+
+```bash
+hermes env show
+```
+
+### ทดสอบการเชื่อมต่อ
+
+```bash
+# ทดสอบ provider ปัจจุบัน
+hermes model test
+
+# ทดสอบ provider เฉพาะ
+hermes model test openrouter
+hermes model test custom:okmd
+```
+
+---
+
+## Custom Provider อื่นๆ
+
+### Ollama (Local Model)
+
+```yaml
+# ใน config.yaml
+model:
+  provider: custom:ollama
+  default: llama3.2
+
+providers:
+  ollama:
+    base_url: http://localhost:11434/api
+    key_env: ""
+    transport: ollama
+```
+
+**ติดตั้ง:**
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull llama3.2
+ollama serve
+```
+
+---
+
+## สรุปคำสั่งสำคัญ
+
+| งาน | คำสั่ง |
+|-----|--------|
+| ดู provider ปัจจุบัน | `hermes config get model` |
+| เปลี่ยน provider | `hermes model` |
+| เปลี่ยน provider (quick) | `hermes config set model.provider openrouter` |
+| เปลี่ยน model | `hermes config set model.default claude-3.5-sonnet` |
+| ตั้ง API key | `hermes env set OPENROUTER_API_KEY sk-...` |
+| ดู API key | `hermes env show` |
+| แก้ config | `hermes config edit` |
+| แก้ .env | `hermes env edit` |
+| ทดสอบ provider | `hermes model test` |
+| เปลี่ยน model (session) | `/model openrouter/claude-3.5-sonnet` |
+
+---
+
 # 🤖 Module 5: สร้าง Telegram Bot
 
 ## Step 5: สร้าง Bot ใน Telegram

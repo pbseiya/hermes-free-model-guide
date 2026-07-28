@@ -668,6 +668,153 @@ TOGETHER_API_KEY=your-together-key
 
 ---
 
+## LiteLLM Proxy (แนะนำสำหรับหลาย Providers)
+
+### LiteLLM คืออะไร?
+
+**LiteLLM** = OpenAI-compatible proxy ที่รวมหลาย providers:
+
+- รองรับ 100+ models (OpenAI, Anthropic, Gemini, Bedrock, Azure)
+- Load balancing, fallback, retry อัตโนมัติ
+- Rate limit management
+- Self-host ได้ (Docker, Python)
+
+### ติดตั้ง LiteLLM
+
+**วิธีที่ 1: Docker (แนะนำ)**
+
+```bash
+docker run -d \
+  --name litellm \
+  -p 4000:4000 \
+  -e OPENAI_API_KEY=sk-... \
+  -e ANTHROPIC_API_KEY=sk-ant-... \
+  -e GEMINI_API_KEY=AIza... \
+  ghcr.io/berriai/litellm:main-latest
+```
+
+**วิธีที่ 2: Python**
+
+```bash
+pip install litellm[proxy]
+
+# สร้าง config file
+cat > litellm_config.yaml << EOF
+model_list:
+  - model_name: gpt-4o
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY
+  
+  - model_name: claude-3.5-sonnet
+    litellm_params:
+      model: anthropic/claude-3.5-sonnet
+      api_key: os.environ/ANTHROPIC_API_KEY
+EOF
+
+# เริ่ม proxy
+litellm --config litellm_config.yaml --port 4000
+```
+
+### ตั้งค่า LiteLLM ใน Hermes
+
+**วิธีที่ 1: ใช้ `hermes model`**
+
+```bash
+hermes model
+```
+
+เลือก:
+- Provider: **Custom endpoint**
+- Base URL: `http://localhost:4000`
+- API Key: `sk-...` (หรือปล่อยว่าง)
+- Model: `gpt-4o`
+
+**วิธีที่ 2: แก้ `config.yaml`**
+
+```yaml
+# ~/.hermes/config.yaml
+custom_providers:
+  - name: litellm
+    base_url: http://localhost:4000
+    key_env: LITELLM_API_KEY
+
+model:
+  default: gpt-4o
+  provider: custom:litellm
+```
+
+### ตัวอย่าง LiteLLM Config
+
+**หลาย Providers:**
+
+```yaml
+# litellm_config.yaml
+model_list:
+  - model_name: gpt-4o
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY
+  
+  - model_name: claude-3.5-sonnet
+    litellm_params:
+      model: anthropic/claude-3.5-sonnet
+      api_key: os.environ/ANTHROPIC_API_KEY
+  
+  - model_name: gemini-2.0-flash
+    litellm_params:
+      model: gemini/gemini-2.0-flash-exp
+      api_key: os.environ/GEMINI_API_KEY
+```
+
+**Load Balancing:**
+
+```yaml
+model_list:
+  - model_name: gpt-4o
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY_1
+  
+  - model_name: gpt-4o
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY_2
+
+router_settings:
+  routing_strategy: simple-shuffle
+  num_retries: 3
+```
+
+**Fallback:**
+
+```yaml
+router_settings:
+  fallbacks:
+    - default: ["default-fallback"]
+  num_retries: 3
+```
+
+### ข้อดีของ LiteLLM
+
+| ข้อดี | คำอธิบาย |
+|-------|----------|
+| **รวมทุก providers** | ใช้ API endpoint เดียว |
+| **Load balancing** | แจกจ่าย request หลาย API keys |
+| **Fallback อัตโนมัติ** | ถ้า provider หนึ่งล่ม ไปใช้ provider อื่น |
+| **Rate limit management** | จัดการ rate limit อัตโนมัติ |
+| **Cost tracking** | ติดตามค่าใช้จ่าย |
+
+### เปลี่ยน Model ใน Hermes
+
+```bash
+/model custom:litellm/gpt-4o
+/model custom:litellm/claude-3.5-sonnet
+/model custom:litellm/gemini-2.0-flash
+```
+
+---
+
 ## Troubleshooting
 
 ### ปัญหา: `hermes setup` ไม่ถาม API key สำหรับ custom provider

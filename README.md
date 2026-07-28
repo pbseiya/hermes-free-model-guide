@@ -38,6 +38,8 @@ curl -fsSL https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/mai
 hermes-free-model-guide/
 ├── README.md                    # ไฟล์นี้
 ├── LICENSE                      # MIT License
+├── CONTRIBUTING.md              # วิธีมีส่วนร่วมในโปรเจกต์
+├── CHANGELOG.md                 # บันทึกการเปลี่ยนแปลง
 ├── SECURITY.md                  # นโยบายความปลอดภัย (ห้าม commit credentials)
 ├── .gitignore                   # ป้องกัน credential รั่ว
 ├── slides/
@@ -50,7 +52,17 @@ hermes-free-model-guide/
 │   └── uninstall-linux.sh       # Linux/macOS uninstaller
 ├── guides/
 │   ├── 01-installation-guide.md # คู่มือติดตั้ง 3 OS
-│   └── 02-change-provider.md    # คู่มือเปลี่ยน Provider + API Key
+│   ├── 02-change-provider.md    # คู่มือเปลี่ยน Provider + API Key (OKMD, LiteLLM, OpenRouter)
+│   ├── 03-okmd-setup.md         # คู่มือสมัครและตั้งค่า OKMD AI Playground
+│   ├── 04-telegram-setup.md     # คู่มือสร้างและตั้งค่า Telegram Bot
+│   └── 05-troubleshooting.md    # คู่มือแก้ปัญหาที่พบบ่อย
+├── examples/
+│   ├── okmd-config.md           # ตัวอย่าง config สำหรับ OKMD
+│   ├── litellm-hosted-config.md # ตัวอย่าง config สำหรับ LiteLLM Hosted (Course 0)
+│   ├── litellm-selfhost-config.md # ตัวอย่าง config สำหรับ LiteLLM Self-host
+│   ├── openrouter-config.md     # ตัวอย่าง config สำหรับ OpenRouter
+│   ├── openai-config.md         # ตัวอย่าง config สำหรับ OpenAI
+│   └── fallback-config.md       # ตัวอย่าง config สำหรับ Fallback (หลาย providers)
 └── templates/
     ├── config.yaml              # ตัวอย่าง config (placeholder — ไม่มี key จริง)
     └── env.example              # ตัวอย่าง .env file
@@ -135,7 +147,18 @@ OKMD ให้ใช้ฟรี **23 models** — **quota share กันทั
 
 ### Guides
 - [01-installation-guide.md](guides/01-installation-guide.md) - คู่มือติดตั้ง 3 OS
-- [02-change-provider.md](guides/02-change-provider.md) - คู่มือเปลี่ยน Provider + API Key (OKMD, LiteLLM, OpenRouter)
+- [02-change-provider.md](guides/02-change-provider.md) - คู่มือเปลี่ยน Provider + API Key
+- [03-okmd-setup.md](guides/03-okmd-setup.md) - คู่มือสมัครและตั้งค่า OKMD AI Playground
+- [04-telegram-setup.md](guides/04-telegram-setup.md) - คู่มือสร้างและตั้งค่า Telegram Bot
+- [05-troubleshooting.md](guides/05-troubleshooting.md) - คู่มือแก้ปัญหาที่พบบ่อย
+
+### Examples (Configuration Templates)
+- [okmd-config.md](examples/okmd-config.md) - ตัวอย่าง config สำหรับ OKMD
+- [litellm-hosted-config.md](examples/litellm-hosted-config.md) - ตัวอย่าง config สำหรับ LiteLLM Hosted (Course 0)
+- [litellm-selfhost-config.md](examples/litellm-selfhost-config.md) - ตัวอย่าง config สำหรับ LiteLLM Self-host
+- [openrouter-config.md](examples/openrouter-config.md) - ตัวอย่าง config สำหรับ OpenRouter
+- [openai-config.md](examples/openai-config.md) - ตัวอย่าง config สำหรับ OpenAI
+- [fallback-config.md](examples/fallback-config.md) - ตัวอย่าง config สำหรับ Fallback (หลาย providers)
 
 ### Slides
 ```bash
@@ -160,9 +183,10 @@ npx @marp-team/marp-cli slides/slides.md -s
 1. ✅ ติดตั้ง Hermes Agent (user-space, ไม่ต้อง admin)
 2. ✅ ติดตั้ง Antigravity CLI (agy) — Gemini free via Google Account
 3. ✅ ตั้งค่า OKMD AI Playground (ถาม API Key ตอนติดตั้ง)
-4. ✅ ตั้งค่า Telegram Bot (ถาม Bot Token + Chat ID)
-5. ✅ ตั้งค่า PATH ให้เรียก `hermes`, `agy` จากทุกโฟลเดอร์
-6. ✅ ตั้งค่า auto-start services (Desktop, Dashboard, Telegram)
+4. ✅ ตั้งค่า LiteLLM Proxy (ถาม API Key สำหรับ Course 0)
+5. ✅ ตั้งค่า Telegram Bot (ถาม Bot Token + Chat ID)
+6. ✅ ตั้งค่า PATH ให้เรียก `hermes`, `agy` จากทุกโฟลเดอร์
+7. ✅ ตั้งค่า auto-start services (Desktop, Dashboard, Telegram)
 
 ### Auto-start Services หลัง Reboot
 
@@ -197,11 +221,11 @@ npx @marp-team/marp-cli slides/slides.md -s
 
 ## 🤝 Contributing
 
-ดู [SECURITY.md](SECURITY.md) สำหรับนโยบายความปลอดภัย
+ดู [CONTRIBUTING.md](CONTRIBUTING.md) สำหรับรายละเอียดวิธีมีส่วนร่วมในโปรเจกต์
 
 ---
 
 **License:** MIT  
 **Author:** Hermes Agent Training Team  
 **Last Updated:** 2026-01-26  
-**Version:** 1.0.0
+**Version:** 1.2.0

@@ -63,6 +63,14 @@ hermes-free-model-guide/
 │   ├── openrouter-config.md     # ตัวอย่าง config สำหรับ OpenRouter
 │   ├── openai-config.md         # ตัวอย่าง config สำหรับ OpenAI
 │   └── fallback-config.md       # ตัวอย่าง config สำหรับ Fallback (หลาย providers)
+├── tests/
+│   ├── test-install.sh          # ทดสอบ installation script
+│   └── test-config.sh           # ทดสอบ configuration templates
+├── .github/
+│   └── workflows/
+│       └── test.yml             # CI/CD pipeline (GitHub Actions)
+├── screenshots/
+│   └── .gitkeep                 # โฟลเดอร์สำหรับ screenshots
 └── templates/
     ├── config.yaml              # ตัวอย่าง config (placeholder — ไม่มี key จริง)
     └── env.example              # ตัวอย่าง .env file
@@ -225,7 +233,48 @@ npx @marp-team/marp-cli slides/slides.md -s
 
 ---
 
+## 🧪 Testing
+
+Repo นี้มี automated tests เพื่อตรวจสอบความถูกต้อง:
+
+### รัน Tests Locally
+
+```bash
+# ทดสอบ installation scripts
+bash tests/test-install.sh
+
+# ทดสอบ configuration templates
+bash tests/test-config.sh
+```
+
+### CI/CD Pipeline
+
+GitHub Actions จะรัน tests อัตโนมัติทุกครั้งที่ push หรือสร้าง pull request:
+- ตรวจสอบโครงสร้างไฟล์
+- Validate YAML syntax
+- ตรวจสอบ hardcoded secrets
+- ตรวจสอบ Markdown links
+
+ดู workflow ที่ [`.github/workflows/test.yml`](.github/workflows/test.yml)
+
+---
+
+## 📸 Screenshots
+
+โฟลเดอร์ `screenshots/` ใช้เก็บ screenshots สำหรับเอกสาร
+
+**Screenshots ที่แนะนำ:**
+- `hermes-setup-screenshot.png` - หน้าจอนี้ตอนรัน `hermes setup`
+- `hermes-cli-screenshot.png` - หน้าจอนี้ตอนรัน `hermes` หรือ `hermes chat`
+- `telegram-bot-test-screenshot.png` - หน้าจอนี้ตอนทดสอบ Telegram bot
+- `okmd-quota-screenshot.png` - หน้าจอนี้แสดง OKMD quota
+- `vscode-hermes-screenshot.png` - หน้าจอนี้ VSCode ที่ติดตั้ง Hermes extension
+
+ดูรายละเอียดเพิ่มเติมที่ [`screenshots/README.md`](screenshots/README.md)
+
+---
+
 **License:** MIT  
 **Author:** Hermes Agent Training Team  
 **Last Updated:** 2026-01-26  
-**Version:** 1.2.0
+**Version:** 1.3.0

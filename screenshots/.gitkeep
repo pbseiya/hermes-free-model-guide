@@ -1,0 +1,26 @@
+# Screenshots Directory
+
+This directory contains screenshots for the documentation.
+
+## Recommended Screenshots
+
+1. **hermes-setup-screenshot.png** - หน้าจอนี้ตอนรัน `hermes setup`
+2. **hermes-cli-screenshot.png** - หน้าจอนี้ตอนรัน `hermes` หรือ `hermes chat`
+3. **telegram-bot-test-screenshot.png** - หน้าจอนี้ตอนทดสอบ Telegram bot
+4. **okmd-quota-screenshot.png** - หน้าจอนี้แสดง OKMD quota
+5. **vscode-hermes-screenshot.png** - หน้าจอนี้ VSCode ที่ติดตั้ง Hermes extension
+
+## How to Add Screenshots
+
+1. Capture screenshot on your system
+2. Save as PNG format
+3. Add to this directory
+4. Reference in README.md or guides using: `![alt text](screenshots/filename.png)`
+
+## Naming Convention
+
+Use descriptive names in lowercase with hyphens:
+- ✅ `hermes-setup-windows.png`
+- ✅ `telegram-bot-test.png`
+- ❌ `Screenshot 1.png`
+- ❌ `HERMES_SETUP.PNG`

@@ -14,6 +14,26 @@
 
 ---
 
+## [1.3.0] - 2026-01-26
+
+### Added
+- เพิ่ม **Automated Tests** (`tests/test-install.sh`, `tests/test-config.sh`)
+- เพิ่ม **CI/CD Pipeline** ด้วย GitHub Actions (`.github/workflows/test.yml`)
+- เพิ่มโฟลเดอร์ **Screenshots** พร้อม `.gitkeep` และ `README.md`
+- อัพเดท `README.md` ให้มีข้อมูลเกี่ยวกับ tests, CI/CD, screenshots
+- Tests ครอบคลุม:
+  - ตรวจสอบโครงสร้างไฟล์และโฟลเดอร์
+  - Validate YAML syntax ใน configuration templates
+  - ตรวจสอบ hardcoded secrets (ป้องกัน credential รั่ว)
+  - ตรวจสอบ Markdown links
+  - ตรวจสอบ `.gitignore` ว่ามี `.env`
+
+### Changed
+- อัพเดท version เป็น 1.3.0
+- ปรับปรุงโครงสร้าง repo ให้พร้อมสำหรับการ contribution
+
+---
+
 ## [1.2.0] - 2026-01-26
 
 ### Added

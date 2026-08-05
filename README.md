@@ -32,6 +32,59 @@ curl -fsSL https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/mai
 
 ---
 
+## 🔑 ค่าที่ต้องใส่หลังติดตั้ง
+
+หลังติดตั้งเสร็จ ต้องใส่ค่าเหล่านี้เพื่อให้ Hermes ใช้งานได้:
+
+### 🔴 จำเป็น (ต้องใส่)
+
+| ค่า | ได้จากไหน | ใช้ทำอะไร |
+|-----|-----------|-----------|
+| **OKMD API Key** | สมัครที่ [playground.okmd.or.th](https://playground.okmd.or.th) | ใช้เรียก 23 free models |
+
+**วิธีสมัคร OKMD:**
+1. Login ด้วย Google Account
+2. ไปที่ Settings → API Platform
+3. Generate API Key (ขึ้นต้นด้วย `sk_...`)
+4. Copy key มาวางตอน install หรือใส่ทีหลัง
+
+### 🟡 Optional (ใส่ก็ได้ ไม่ใส่ก็ได้)
+
+| ค่า | ได้จากไหน | ใช้ทำอะไร |
+|-----|-----------|-----------|
+| **LiteLLM API Key** | Instructor ให้มา (Course 0) | ใช้ LiteLLM Proxy แทน OKMD |
+| **Telegram Bot Token** | สร้างจาก [@BotFather](https://t.me/BotFather) | คุยกับ Hermes ผ่าน Telegram |
+| **Telegram Chat ID** | หาจาก [@userinfobot](https://t.me/userinfobot) | จำกัดให้เฉพาะคุณใช้ Bot ได้ |
+
+### 🔄 ขั้นตอนหลังติดตั้ง
+
+```bash
+# 1. ถ้าไม่ได้ใส่ค่าตอน install → ใส่ทีหลังได้
+hermes setup
+
+# 2. หรือเปลี่ยน model/provider
+hermes model
+
+# 3. ตรวจสอบว่าทำงานได้
+hermes doctor
+
+# 4. เริ่มใช้งาน
+hermes                    # CLI chat
+hermes desktop            # Desktop app
+hermes dashboard          # Web dashboard (http://localhost:9119)
+hermes gateway start      # Telegram bot
+```
+
+### 📊 สรุป
+
+| สถานะ | ค่าที่ต้องใส่ |
+|-------|---------------|
+| **Minimal** | OKMD API Key เท่านั้น |
+| **Full setup** | OKMD + Telegram Bot + Chat ID |
+| **Course 0** | LiteLLM API Key (จาก instructor) |
+
+---
+
 ## 📁 โครงสร้าง Repo
 
 ```

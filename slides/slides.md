@@ -1,4 +1,5 @@
 ---
+
 marp: true
 theme: default
 paginate: true
@@ -8,47 +9,78 @@ style: |
   section {
     font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
     background: white;
+    font-size: 1em;
+    padding: 20px 30px 60px 30px;
+    line-height: 1.5;
   }
-  h1 { color: #1e40af; font-size: 2.2em; }
-  h2 { color: #2563eb; font-size: 1.6em; }
+  h1 { color: #1e3a8a; font-size: 2.0em; margin-bottom: 0.3em; font-weight: 700; }
+  h2 { color: #2563eb; font-size: 1.4em; margin-bottom: 0.2em; font-weight: 600; }
+  h3 { font-size: 1.2em; margin-bottom: 0.15em; font-weight: 600; }
+  p { margin: 0.3em 0; }
+  ul, ol { margin: 0.2em 0; padding-left: 1.5em; }
+  li { margin: 0.1em 0; }
   code {
     background: #f3f4f6;
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: 2px 4px;
+    border-radius: 3px;
     font-family: 'Fira Code', monospace;
+    font-size: 0.95em;
   }
   pre code {
     display: block;
-    padding: 16px;
+    padding: 8px 12px;
     background: #1e293b;
     color: #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.85em;
+    border-radius: 5px;
+    font-size: 0.9em;
+    line-height: 1.4;
+    margin: 5px 0;
   }
-  table { width: 100%; border-collapse: collapse; margin: 12px 0; }
-  th { background: #2563eb; color: white; padding: 10px; text-align: left; }
-  td { padding: 8px; border-bottom: 1px solid #e5e7eb; }
+  pre { margin: 5px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 1em; }
+  th { background: #2563eb; color: white; padding: 8px 10px; text-align: left; font-weight: 600; }
+  td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; }
   tr:nth-child(even) { background: #f9fafb; }
-  .highlight { background: #fef3c7; padding: 14px; border-left: 4px solid #f59e0b; margin: 14px 0; }
-  .success { background: #d1fae5; padding: 14px; border-left: 4px solid #10b981; margin: 14px 0; }
-  .warning { background: #fee2e2; padding: 14px; border-left: 4px solid #ef4444; margin: 14px 0; }
-  .info { background: #dbeafe; padding: 14px; border-left: 4px solid #3b82f6; margin: 14px 0; }
+  .highlight { background: #fef3c7; padding: 10px 14px; border-left: 4px solid #f59e0b; margin: 8px 0; font-size: 1em; }
+  .success { background: #E8F5E9; padding: 10px 14px; border-left: none; margin: 8px 0 20px 0; font-size: 0.9em; line-height: 1.4; border-radius: 8px; }
+  .success ol { padding-left: 2em; }
+  .success .note { font-weight: 600; margin-top: 6px; }
+  .warning { background: #fee2e2; padding: 10px 14px; border-left: 4px solid #ef4444; margin: 8px 0; font-size: 1em; }
+  .info { background: #dbeafe; padding: 10px 14px; border-left: 4px solid #3b82f6; margin: 8px 0; font-size: 1em; }
+  footer { bottom: 5px; right: 10px; font-size: 0.65em; text-align: right; }
+  section { overflow: hidden; }
+  .avatar-left { position: absolute; left: 0; top: 0; width: 43%; height: 100%; overflow: hidden; z-index: 0; }
+  .avatar-left img { width: 100%; height: 100%; object-fit: cover; object-position: center center; }
+  .content-right { position: relative; margin-left: 45%; padding: 25px 25px 30px 15px; z-index: 1; }
+  .header-small { font-size: 0.75em; color: #757575; margin-bottom: 10px; }
+  .tagline { font-size: 0.85em; font-weight: normal; color: #6b7280; margin-top: 10px; }
 ---
 
-# 🐍 Module 1: ติดตั้ง Hermes Agent + ใช้ Free Model
+<div class="avatar-left">
+<img src="../images/hermes-evangelion.jpg" alt="Hermes Avatar">
+</div>
 
-## เสร็จใน 10 นาที — ไม่ต้องเสียเงิน!
+<div class="content-right">
 
-<div class="success">
+# 🎓 Hermes Agent Workshop
 
-**สิ่งที่ได้ทำวันนี้:**
+## ติดตั้งและใช้งาน AI Agent ด้วย Free Model
+
+<div class="tagline">⏱️ สร้างใน 10 นาที — ไม่ต้องเสียเงิน!</div>
+
+<div class="success" style="margin-top: 15px; padding: 12px 15px;">
+
+**สิ่งที่ได้วันนี้:**
+
 1. ✅ ติดตั้ง Hermes Agent (Windows / Linux / macOS)
 2. ✅ สมัคร OKMD AI Playground (ฟรีสูงสุด 1M tokens/day)
 3. ✅ ตั้งค่า Hermes ให้ใช้ Free Model
 4. ✅ สร้าง Telegram Bot — คุยกับ AI ผ่าน Telegram
-5. ✅ ทดสอบใช้งานจริง
+5. ✅ ทดลองใช้งานจริง
 
-**ไม่ต้องมี admin/sudo** — ติดตั้งใน user folder ทั้งหมด
+<div class="note">ไม่ต้องมี admin/sudo — ติดตั้งใน user folder ทั้งหมด</div>
+
+</div>
 
 </div>
 
@@ -97,32 +129,43 @@ style: |
 
 </div>
 
-### Models ที่มีให้ใช้ฟรี (23 Models!)
+### Models ยอดนิยม (OpenAI, Anthropic, DeepSeek)
 
 | Model | Provider | Quota/วัน | เหมาะสำหรับ |
 |-------|----------|-----------|-------------|
-| `gpt-5.4` | OpenAI | 350K | ฉลาดสุดของ OpenAI |
-| `gpt-5.4-mini` | OpenAI | 350K | สมดุลดี |
-| `gpt-5.4-nano` | OpenAI | 350K | เร็ว, เบา |
-| `claude-sonnet-5` | Anthropic | 180K | ฉลาด, งานซับซ้อน |
-| `claude-sonnet-4.6` | Anthropic | 180K | รุ่นก่อน, เสถียร |
-| `deepseek-v4-pro` | DeepSeek | **1M** | Reasoning, วิเคราะห์ |
-| `deepseek-v4-flash` | DeepSeek | **1M** | เร็ว, quota เยอะ |
-| `llama-4-maverick` | Meta AI | 200K | Opensource, ฉลาด |
-| `llama-4-scout` | Meta AI | 200K | Opensource, เร็ว |
-| `grok-4.3` | xAI | 100K | ข้อมูลล่าสุด |
-| `qwen3.7-plus` | Qwen | 100K | ภาษาดี |
-| `qwen3.7-max` | Qwen | 100K | ฉลาด |
-| `qwen3.6-flash` | Qwen | 100K | เร็ว |
-| `gemini-2.5-flash-lite` | Google | 200K | เร็ว, เบา |
-| `mistral-medium-3.1` | Mistral | 100K | ยุโรป, หลายภาษา |
-| `nova-pro-v1` | AWS | 200K | AWS |
-| `nova-2-lite-v1` | AWS | 200K | เร็ว, เบา |
+| `gpt-4o` | OpenAI | 350K | ฉลาดสุดของ OpenAI |
+| `gpt-4o-mini` | OpenAI | 350K | สมดุลดี (แนะนำ) |
+| `gpt-4-turbo` | OpenAI | 350K | เร็ว, ประหยัด |
+| `claude-3-5-sonnet` | Anthropic | 180K | ฉลาด, งานซับซ้อน |
+| `claude-3-haiku` | Anthropic | 180K | เร็ว, เบา |
+| `deepseek-chat` | DeepSeek | **1M** | Reasoning, วิเคราะห์ |
+| `deepseek-coder` | DeepSeek | **1M** | เขียนโค้ด, quota เยอะสุด |
+
+---
+
+# 💰 Free Models (ต่อ)
+
+## Models อื่นๆ ที่น่าสนใจ
+
+### Meta, xAI, Qwen, Google, Mistral, AWS
+
+| Model | Provider | Quota/วัน | เหมาะสำหรับ |
+|-------|----------|-----------|-------------|
+| `llama-3.1-70b` | Meta AI | 200K | Opensource, ฉลาด |
+| `llama-3.1-8b` | Meta AI | 200K | Opensource, เร็ว |
+| `grok-beta` | xAI | 100K | ข้อมูลล่าสุด |
+| `qwen-72b-chat` | Qwen | 100K | ภาษาดี |
+| `qwen-14b-chat` | Qwen | 100K | เร็ว, เบา |
+| `gemini-2.0-flash` | Google | 200K | เร็ว, เบา |
+| `gemini-1.5-pro` | Google | 200K | ฉลาด, งานซับซ้อน |
+| `mistral-large` | Mistral | 100K | ยุโรป, หลายภาษา |
+| `amazon.nova-pro` | AWS | 200K | AWS |
+| `amazon.nova-lite` | AWS | 200K | เร็ว, เบา |
 
 <div class="warning">
 
 **⚠️ Quota share กันทั้ง Provider!**
-- ใช้ `gpt-5.4` 100K → `gpt-5.4-mini` เหลือ 250K (ไม่ใช่ได้คนละ 350K!)
+- ใช้ `gpt-4o` 100K → `gpt-4o-mini` เหลือ 250K (ไม่ใช่ได้คนละ 350K!)
 - ใช้ chat ที่ web playground.okmd.or.th ก็หัก quota ด้วย
 - เช็ค quota: ดูที่ Usage ใน OKMD Playground หรือ `hermes insights`
 
@@ -142,12 +185,18 @@ style: |
 | 4 | Telegram App (สำหรับคุยกับ AI) | ✅ |
 | 5 | PowerShell 5.1+ (Windows) — มีอยู่แล้ว | ✅ |
 
-<div class="highlight">
+---
 
-**⚠️ สำหรับ Windows: ปิด Antivirus ชั่วคราว**
-- Windows Security → Virus & threat protection → Manage settings
-- ปิด **Real-time protection**
-- หลังติดตั้งเสร็จ → เปิดกลับ
+## ⚠️ สำหรับ Windows: ปิด Antivirus ชั่วคราว
+
+<div class="warning">
+
+**ก่อนติดตั้ง ต้องปิด Antivirus ชั่วคราว!**
+
+1. เปิด **Windows Security**
+2. ไปที่ **Virus & threat protection** → **Manage settings**
+3. ปิด **Real-time protection**
+4. หลังติดตั้งเสร็จ → **เปิดกลับทันที**
 
 </div>
 
@@ -191,30 +240,19 @@ hermes --version
 
 <div class="success">
 
-ถ้าเห็น版本号 (เช่น `0.18.x`) = ติดตั้งสำเร็จ! ✅
+ถ้าเห็นเลขเวอร์ชัน (เช่น `0.18.x`) = ติดตั้งสำเร็จ! ✅
 
 </div>
 
-### ถ้า `hermes` ไม่เจอคำสั่ง
+---
 
-**Windows:**
-```powershell
-# เปิด PowerShell ใหม่ หรือรัน
-$env:Path = "$env:USERPROFILE\.local\bin;$env:Path"
-```
+## 🩺 แก้ปัญหา
 
-**macOS / Linux:**
-```bash
-source ~/.bashrc   # หรือ source ~/.zshrc
-```
+**ถ้า `hermes` ไม่เจอคำสั่ง:**
+- **Windows:** เปิด PowerShell ใหม่
+- **Linux/macOS:** รัน `source ~/.bashrc`
 
-### วินิจฉัยปัญหา
-
-```bash
-hermes doctor
-```
-
-คำสั่งนี้จะเช็ค dependencies + config แล้วบอกว่าอะไรขาดหาย
+**วินิจฉัยปัญหา:** `hermes doctor`
 
 ---
 
@@ -260,8 +298,8 @@ hermes setup
 1. **Provider** → Custom endpoint
 2. **Base URL** → `https://gen.ai.kku.ac.th/okmd/api/v1`
 3. **API Key** → วาง OKMD key ที่ copy มา
-4. **Model** → `gpt-5.4-mini` (แนะนำ — 350K quota)
-   หรือ `deepseek-v4-flash` (1M quota เยอะสุด)
+4. **Model** → `gpt-4o-mini` (แนะนำ — 350K quota)
+   หรือ `deepseek-chat` (1M quota เยอะสุด)
 
 ### วิธีที่ 2: แก้ config เอง
 
@@ -271,78 +309,54 @@ hermes config edit
 
 ---
 
-# 🔧 ตั้งค่า config.yaml (วิธีแก้เอง)
+# 🔧 ตั้งค่า config.yaml
 
-## เปิด config แล้วแก้ตามนี้
-
+**1. แก้ไข config:**
 ```bash
 hermes config edit
 ```
-
 ```yaml
-# ~/.hermes/config.yaml
 model:
   provider: custom:okmd
-  default: gpt-5.4-mini
-
+  default: gpt-4o-mini
 providers:
   okmd:
     base_url: https://gen.ai.kku.ac.th/okmd/api/v1
     key_env: OKMD_API_KEY
-    transport: openai_chat
 ```
 
-### ตั้ง API Key ใน .env
-
+**2. เพิ่ม API Key ใน .env:**
 ```bash
-hermes config env-path
-# จะได้ path เช่น ~/.hermes/.env
+hermes env edit
 ```
-
 ```bash
-# ~/.hermes/.env
 OKMD_API_KEY=sk_YOUR_KEY_HERE
 ```
-
-<div class="warning">
-
-**⚠️ อย่าใส่ API key จริงใน config.yaml** — ใส่ใน `.env` เท่านั้น!
-
-</div>
 
 ---
 
 # ⚠️ ปัญหา SSL Certificate
 
-## OKMD ใช้ self-signed certificate
+**OKMD ใช้ self-signed certificate** — Node.js จะปฏิเสธการเชื่อมต่อ
 
-OKMD API endpoint (`gen.ai.kku.ac.th`) ใช้ SSL certificate ที่ self-signed ซึ่ง Node.js จะปฏิเสธการเชื่อมต่อ
-
-### วิธีแก้: ตั้ง environment variable
-
+**วิธีแก้:** เพิ่มใน `~/.hermes/.env`:
 ```bash
-# เพิ่มใน ~/.hermes/.env
 NODE_TLS_REJECT_UNAUTHORIZED=0
 ```
 
-### หรือแก้ถาวร (macOS / Linux)
-
+**แก้ถาวร (macOS/Linux):**
 ```bash
-# เพิ่มใน shell config (~/.bashrc หรือ ~/.zshrc)
-export NODE_TLS_REJECT_UNAUTHORIZED=0
+echo 'export NODE_TLS_REJECT_UNAUTHORIZED=0' >> ~/.bashrc
 ```
 
-### Windows (PowerShell)
-
+**Windows (PowerShell):**
 ```powershell
-# เพิ่มใน Environment Variables
 [System.Environment]::SetEnvironmentVariable('NODE_TLS_REJECT_UNAUTHORIZED', '0', 'User')
 ```
 
 <div class="warning">
 
-**⚠️ การตั้ง `NODE_TLS_REJECT_UNAUTHORIZED=0`** ลดความปลอดภัยของ HTTPS ทั้งหมด
-ใช้เฉพาะกับ OKMD API เท่านั้น ถ้าต้องการความปลอดภัยสูงกว่านี้ ต้อง export certificate จาก OKMD เพิ่ม
+⚠️ ลดความปลอดภัยของ HTTPS ทั้งหมด — ใช้เฉพาะกับ OKMD
 
 </div>
 
@@ -360,28 +374,13 @@ curl -sk https://gen.ai.kku.ac.th/okmd/api/v1/models \
 
 ### เปลี่ยน model ใน Hermes
 
+ใน Hermes chat:
 ```
-# ใน Hermes chat
-/model gpt-5.4-mini
-/model deepseek-v4-flash
-/model claude-sonnet-5
-/model llama-4-maverick
+/model gpt-4o-mini
+/model deepseek-chat
+/model claude-3-5-sonnet
+/model llama-3.1-70b
 ```
-
-### Models ฟรีที่น่าใช้ (เรียงตาม Quota)
-
-| Model | Quota/วัน | Speed | Intelligence | ใช้เมื่อ |
-|-------|-----------|-------|-------------|---------|
-| `deepseek-v4-flash` | **1M** | ⚡⚡⚡ | 🧠🧠🧠 | ใช้เยอะ, quota เยอะสุด |
-| `deepseek-v4-pro` | **1M** | ⚡⚡ | 🧠🧠🧠🧠 | Reasoning, วิเคราะห์ |
-| `gpt-5.4` | 350K | ⚡⚡ | 🧠🧠🧠🧠 | ฉลาดสุดของ OpenAI |
-| `gpt-5.4-mini` | 350K | ⚡⚡⚡ | 🧠🧠🧠 | **แนะนำ** สมดุลดี |
-| `gpt-5.4-nano` | 350K | ⚡⚡⚡⚡ | 🧠🧠 | เร็ว, เบา |
-| `llama-4-maverick` | 200K | ⚡⚡ | 🧠🧠🧠 | Opensource, ฉลาด |
-| `claude-sonnet-5` | 180K | ⚡ | 🧠🧠🧠🧠 | งานซับซ้อน, เขียนโค้ด |
-| `gemini-2.5-flash-lite` | 200K | ⚡⚡⚡⚡ | 🧠🧠 | เร็ว, เบา |
-| `grok-4.3` | 100K | ⚡⚡ | 🧠🧠🧠 | ข้อมูลล่าสุด |
-| `qwen3.7-plus` | 100K | ⚡⚡ | 🧠🧠🧠 | ภาษาดี |
 
 ---
 
@@ -394,9 +393,7 @@ curl -sk https://gen.ai.kku.ac.th/okmd/api/v1/models \
 
 </div>
 
-## เปลี่ยนจาก OKMD เป็น Provider อื่น
-
-### วิธีที่ 1: ใช้ hermes model (แนะนำ)
+## วิธีที่ 1: ใช้ hermes model (แนะนำ)
 
 ```bash
 hermes model
@@ -414,40 +411,37 @@ hermes model
 1. เลือก "Custom endpoint (self-hosted / VLLM / etc.)"
 2. ใส่ **Base URL** (เช่น `https://gen.ai.kku.ac.th/okmd/api/v1`)
 3. ใส่ **API Key** (เช่น `sk_...`)
-4. ใส่ **Model name** (เช่น `gpt-5.4-mini`)
+4. ใส่ **Model name** (เช่น `gpt-4o-mini`)
 
-### วิธีที่ 2: แก้ config.yaml โดยตรง
+---
+
+## วิธีที่ 2: แก้ config.yaml โดยตรง
 
 ```bash
 hermes config edit
 ```
 
-**เพิ่มส่วน `custom_providers`:**
-
+**เพิ่มใน config.yaml:**
 ```yaml
-# ~/.hermes/config.yaml
 custom_providers:
   - name: okmd
     base_url: https://gen.ai.kku.ac.th/okmd/api/v1
     key_env: OKMD_API_KEY
 
 model:
-  default: gpt-5.4-mini
+  default: gpt-4o-mini
   provider: custom:okmd
 ```
 
-**ตั้ง API Key ใน `.env`:**
-
+**ตั้ง API Key:**
 ```bash
 hermes env edit
+# เพิ่ม: OKMD_API_KEY=sk_your_actual_key_here
 ```
 
-```bash
-# ~/.hermes/.env
-OKMD_API_KEY=sk_your_actual_key_here
-```
+---
 
-### วิธีที่ 3: ใช้คำสั่ง
+## วิธีที่ 3: ใช้คำสั่ง
 
 ```bash
 # เปลี่ยนเป็น OpenRouter
@@ -626,44 +620,26 @@ hermes model test custom:okmd
 
 ## Custom Provider อื่นๆ
 
-### Ollama (Local Model)
-
+**Ollama (Local Model):**
 ```yaml
-# ~/.hermes/config.yaml
 custom_providers:
   - name: ollama
     base_url: http://localhost:11434/api
-    key_env: ""
-
 model:
   provider: custom:ollama
   default: llama3.2
 ```
+ติดตั้ง: `curl -fsSL https://ollama.com/install.sh | sh && ollama pull llama3.2`
 
-**ติดตั้ง:**
-```bash
-curl -fsSL https://ollama.com/install.sh | sh
-ollama pull llama3.2
-ollama serve
-```
-
-### Together AI
-
+**Together AI:**
 ```yaml
-# ~/.hermes/config.yaml
 custom_providers:
   - name: together
     base_url: https://api.together.xyz/v1
     key_env: TOGETHER_API_KEY
-
 model:
   provider: custom:together
   default: mistralai/Mixtral-8x7B-Instruct-v0.1
-```
-
-```bash
-# ~/.hermes/.env
-TOGETHER_API_KEY=your-together-key
 ```
 
 ---
@@ -698,7 +674,7 @@ Course 0 ใช้ LiteLLM Proxy ที่ host บน Cloudflare Workers ผู
 # ~/.hermes/config.yaml
 model:
   provider: custom:litellm
-  default: qwen3.7-plus
+  default: qwen-72b-chat
 
 providers:
   litellm:
@@ -732,6 +708,8 @@ docker run -d \
   ghcr.io/berriai/litellm:main-latest
 ```
 
+---
+
 #### ติดตั้ง LiteLLM ด้วย Python
 
 ```bash
@@ -754,6 +732,8 @@ EOF
 # เริ่ม proxy
 litellm --config litellm_config.yaml --port 4000
 ```
+
+---
 
 ### ตั้งค่า LiteLLM Self-host ใน Hermes
 
@@ -787,8 +767,7 @@ model:
 
 ### ตัวอย่าง LiteLLM Config (Self-host)
 
-#### หลาย Providers:
-
+**หลาย Providers:**
 ```yaml
 # litellm_config.yaml
 model_list:
@@ -796,39 +775,33 @@ model_list:
     litellm_params:
       model: openai/gpt-4o
       api_key: os.environ/OPENAI_API_KEY
-  
   - model_name: claude-3.5-sonnet
     litellm_params:
       model: anthropic/claude-3.5-sonnet
       api_key: os.environ/ANTHROPIC_API_KEY
-  
   - model_name: gemini-2.0-flash
     litellm_params:
       model: gemini/gemini-2.0-flash-exp
       api_key: os.environ/GEMINI_API_KEY
 ```
 
-#### Load Balancing:
-
+**Load Balancing:**
 ```yaml
 model_list:
   - model_name: gpt-4o
     litellm_params:
       model: openai/gpt-4o
       api_key: os.environ/OPENAI_API_KEY_1
-  
   - model_name: gpt-4o
     litellm_params:
       model: openai/gpt-4o
       api_key: os.environ/OPENAI_API_KEY_2
-
 router_settings:
   routing_strategy: simple-shuffle
   num_retries: 3
 ```
 
-#### Fallback:
-
+**Fallback:**
 ```yaml
 router_settings:
   fallbacks:
@@ -853,13 +826,13 @@ router_settings:
 ```yaml
 # ~/.hermes/config.yaml
 model:
-  default: qwen3.7-plus
+  default: qwen-72b-chat
   fallbacks:
     - anthropic/claude-sonnet-4
     - openai/gpt-4o
 ```
 
-เมื่อ model หลัก (qwen3.7-plus) ไม่ตอบสนอง Hermes จะลองใช้ model ถัดไปโดยอัตโนมัติ
+เมื่อ model หลัก (qwen-72b-chat) ไม่ตอบสนอง Hermes จะลองใช้ model ถัดไปโดยอัตโนมัติ
 
 ---
 
@@ -1107,36 +1080,28 @@ launchctl load ~/Library/LaunchAgents/com.hermes.desktop.plist
 
 # 🗑️ Uninstallation
 
-## วิธีลบ Hermes Agent ออกทั้งหมด
+## วิธีลบ Hermes Agent
 
-### Windows (PowerShell)
+**Windows:**
 ```powershell
-# Basic uninstall
-$f="$env:TEMP\hermes-uninstall.ps1"; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1' -OutFile $f -UseBasicParsing; powershell -ExecutionPolicy Bypass -File $f; Remove-Item $f
-
-# Full uninstall (include agy and Node.js)
-$f="$env:TEMP\hermes-uninstall.ps1"; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1' -OutFile $f -UseBasicParsing; powershell -ExecutionPolicy Bypass -File $f -RemoveAgy -RemoveNode -Force; Remove-Item $f
+# Basic:
+irm https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1 | iex
+# Full (include agy, Node.js):
+irm https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1 | iex - -RemoveAgy -RemoveNode -Force
 ```
 
-### Linux / macOS
+**Linux / macOS:**
 ```bash
-# Basic uninstall
+# Basic:
 curl -fsSL https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-linux.sh | bash
-
-# Full uninstall (include agy and Node.js)
+# Full (include agy, Node.js):
 curl -fsSL https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-linux.sh | bash -s -- --remove-agy --remove-node --force
 ```
 
-### สิ่งที่ Uninstall Script ลบออก
-
-| รายการ | ลบอัตโนมัติ? |
-|--------|-------------|
-| Hermes Agent และ configuration | ✅ |
-| Startup services (Desktop, Dashboard, Telegram) | ✅ |
-| `~/.hermes` directory | ✅ |
-| PATH entries | ✅ |
-| **agy** (Antigravity CLI) | ⚠️ ใช้ `--remove-agy` |
-| **Node.js** | ⚠️ ใช้ `--remove-node` |
+### สิ่งที่ลบออก
+- ✅ Hermes Agent, configuration, startup services, `~/.hermes`, PATH
+- ⚠️ **agy** → ใช้ `--remove-agy`
+- ⚠️ **Node.js** → ใช้ `--remove-node`
 
 ---
 
@@ -1177,8 +1142,6 @@ Search for: AI news 2026  # ทดสอบ web search
 
 ## 📊 ตรวจสอบ Quota Usage
 
-## ดูว่าใช้ไปเท่าไหร่แล้ว
-
 OKMD API จะบอก quota ในทุก response:
 
 ```json
@@ -1189,46 +1152,26 @@ OKMD API จะบอก quota ในทุก response:
 }
 ```
 
-### Quota รวมตาม Provider (ข้อมูลจริง Jul 2026)
-
-| Provider | Quota รวม/วัน | Models ใน Provider |
-|----------|--------------|---------------------|
-| **Deepseek** | **1,000,000** | `deepseek-v4-pro`, `deepseek-v4-flash` |
-| **OpenAI** | 350,000 | `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.4-nano` |
-| **Gemini** | 200,000 | `gemini-3.5-flash`, `gemini-3.1-flash-lite`, `gemini-2.5-flash-lite` + อื่นๆ |
-| **Meta AI** | 200,000 | `llama-4-maverick`, `llama-4-scout` |
-| **Nova (AWS)** | 200,000 | `nova-pro-v1`, `nova-2-lite-v1` |
-| **Claude** | 180,000 | `claude-sonnet-5`, `claude-sonnet-4.6` |
-| **xAI** | 100,000 | `grok-4.3` |
-| **Perplexity** | 100,000 | `sonar-pro` |
-| **Qwen** | 100,000 | `qwen3.7-plus`, `qwen3.7-max`, `qwen3.6-flash` |
-| **Mistral** | 100,000 | `mistral-medium-3.1` |
-
-<div class="warning">
-
-**⚠️ Quota share กันทั้ง Provider!**
-- ใช้ `gpt-5.4` ไป 100K → `gpt-5.4-mini` เหลือแค่ 250K (ไม่ใช่ได้คนละ 350K!)
-- ใช้ chat ที่ web playground.okmd.or.th ก็หัก quota ด้วย
-- เช็ค quota: ดูที่ **Usage** ใน OKMD Playground
-
-</div>
-
 ### เช็ค quota ผ่าน Hermes
 
 ```bash
 hermes insights
 ```
 
+---
+
+## Quota รวมตาม Provider (Jul 2026)
+
+| Provider | Quota/วัน | Models สำคัญ |
+|----------|-----------|--------------|
+| **Deepseek** | **1M** | `deepseek-chat`, `deepseek-coder` |
+| **OpenAI** | 350K | `gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo` |
+| **Gemini/Meta/Claude** | 200K/180K | `gemini-2.0-flash`, `llama-3.1-70b`, `claude-3-5-sonnet` |
+| **xAI/Qwen** | 100K | `grok-beta`, `qwen-72b-chat` |
+
 <div class="success">
 
-**Quota share กันทั้ง Provider** — ใช้ model หนึ่งหักจาก quota รวมของ provider นั้น
-
-**1M tokens (DeepSeek) = ประมาณ:**
-- 💬 1,000+ บทสนทนา/วัน
-- 📄 อ่านเอกสาร ~250 หน้า/วัน
-- 🔧 รันคำสั่ง ~500 ครั้ง/วัน
-
-**ใช้ได้สบายๆ ไม่มีหมด!**
+**1M tokens ≈** 💬 1,000+ chats | 📄 250 pages | 🔧 500 commands
 
 </div>
 
@@ -1269,6 +1212,78 @@ hermes gateway restart
 # เช็ค log
 tail ~/.hermes/logs/gateway.log
 ```
+
+---
+
+# 🔑 ค่าที่ต้องใส่หลังติดตั้ง
+
+## สิ่งที่ต้องตั้งค่า
+
+หลังติดตั้งเสร็จ ต้องใส่ค่าเหล่านี้เพื่อให้ Hermes ใช้งานได้:
+
+<div class="info">
+
+### 🔴 จำเป็น (ต้องใส่)
+
+| ค่า | ได้จากไหน | ใช้ทำอะไร |
+|-----|-----------|-----------|
+| **OKMD API Key** | [playground.okmd.or.th](https://playground.okmd.or.th) | ใช้เรียก 23 free models |
+
+**วิธีสมัคร OKMD:**
+1. Login ด้วย Google Account
+2. ไปที่ Settings → API Platform
+3. Generate API Key (ขึ้นต้นด้วย `sk_...`)
+4. Copy key มาวางตอน install หรือใส่ทีหลัง
+
+</div>
+
+### 🟡 Optional (ใส่ก็ได้ ไม่ใส่ก็ได้)
+
+| ค่า | ได้จากไหน | ใช้ทำอะไร |
+|-----|-----------|-----------|
+| **LiteLLM API Key** | Instructor ให้มา (Course 0) | ใช้ LiteLLM Proxy แทน OKMD |
+| **Telegram Bot Token** | สร้างจาก [@BotFather](https://t.me/BotFather) | คุยกับ Hermes ผ่าน Telegram |
+| **Telegram Chat ID** | หาจาก [@userinfobot](https://t.me/userinfobot) | จำกัดให้เฉพาะคุณใช้ Bot ได้ |
+
+---
+
+## ขั้นตอนหลังติดตั้ง
+
+### ใส่ค่าทีหลัง (ถ้าไม่ได้ใส่ตอน install)
+
+```bash
+# 1. ตั้งค่า OKMD API Key
+hermes setup
+# เลือก Provider → Custom endpoint
+# Base URL → https://gen.ai.kku.ac.th/okmd/api/v1
+# API Key → วาง OKMD key
+
+# 2. หรือเปลี่ยน model/provider
+hermes model
+
+# 3. ตรวจสอบว่าทำงานได้
+hermes doctor
+
+# 4. เริ่มใช้งาน
+hermes                    # CLI chat
+hermes desktop            # Desktop app
+hermes dashboard          # Web dashboard (http://localhost:9119)
+hermes gateway start      # Telegram bot
+```
+
+### สรุปสถานะการตั้งค่า
+
+| สถานะ | ค่าที่ต้องใส่ |
+|-------|---------------|
+| **Minimal** | OKMD API Key เท่านั้น |
+| **Full setup** | OKMD + Telegram Bot + Chat ID |
+| **Course 0** | LiteLLM API Key (จาก instructor) |
+
+<div class="success">
+
+**💡 เคล็ดลับ:** ถ้าไม่ได้ใส่ค่าตอนติดตั้ง ไม่ต้องกังวล! ใส่ทีหลังได้เสมอด้วยคำสั่ง `hermes setup`
+
+</div>
 
 ---
 

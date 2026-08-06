@@ -228,10 +228,14 @@ if (Test-Path $hermesExe) {
         if (Test-Path $hermesDir) {
             Remove-Item $hermesDir -Recurse -Force
         }
-        & git clone https://github.com/NousResearch/hermes-agent $hermesDir 2>&1 | Out-Null
+        # Use cmd /c like hermes-windows-test for better compatibility
+        cmd /c "git clone --depth 1 https://github.com/NousResearch/hermes-agent.git `"$hermesDir`" 2>nul 1>nul"
+        if ($LASTEXITCODE -ne 0) {
+            throw "git clone failed with exit code $LASTEXITCODE"
+        }
         Write-Ok "Repository cloned"
     } catch {
-        Write-Err "Failed to clone repository"
+        Write-Err "Failed to clone repository: $_"
         exit 1
     }
 

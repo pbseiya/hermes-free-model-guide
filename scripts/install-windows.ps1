@@ -98,23 +98,74 @@ if ($nodeCmd) {
 }
 
 # =============================================================================
-# Step 3: Install Hermes Agent
+# Step 3: Install Hermes Agent (local install, no admin required)
 # =============================================================================
 Write-Step "Step 3: Install Hermes Agent"
 
-$hermesCmd = Get-Command hermes -ErrorAction SilentlyContinue
-if ($hermesCmd) {
-    $hermesVer = hermes --version 2>$null
+$hermesDir = Join-Path $HermesHome "hermes-agent"
+$hermesExe = Join-Path $hermesDir "venv\Scripts\hermes.exe"
+
+if (Test-Path $hermesExe) {
+    $hermesVer = & $hermesExe --version 2>$null
     Write-Ok "Hermes already installed: $hermesVer"
 } else {
-    Write-Info "Installing Hermes Agent via npm..."
-    
-    try {
-        npm install -g hermes-agent 2>&1 | Out-Null
-        Write-Ok "Hermes installed successfully"
-    } catch {
-        Write-Err "Failed to install Hermes Agent"
+    Write-Info "Installing Hermes Agent (user-space, no admin required)..."
+
+    # Check if git is available
+    $gitCmd = Get-Command git -ErrorAction SilentlyContinue
+    if (-not $gitCmd) {
+        Write-Err "Git not found. Please install Git first:"
+        Write-Host "  Download from: https://git-scm.com/download/win" -ForegroundColor Yellow
+        exit 1
     }
+
+    # Clone hermes-agent repo
+    Write-Info "Cloning hermes-agent repository..."
+    try {
+        if (Test-Path $hermesDir) {
+            Remove-Item $hermesDir -Recurse -Force
+        }
+        & git clone https://github.com/NousResearch/hermes-agent $hermesDir 2>&1 | Out-Null
+        Write-Ok "Repository cloned"
+    } catch {
+        Write-Err "Failed to clone repository"
+        exit 1
+    }
+
+    # Create virtual environment
+    Write-Info "Creating Python virtual environment..."
+    try {
+        & python -m venv (Join-Path $hermesDir "venv") 2>&1 | Out-Null
+        Write-Ok "Virtual environment created"
+    } catch {
+        Write-Err "Failed to create virtual environment"
+        exit 1
+    }
+
+    # Install Python dependencies
+    Write-Info "Installing Python dependencies..."
+    try {
+        $pipPath = Join-Path $hermesDir "venv\Scripts\pip.exe"
+        & $pipPath install -e ".[all]" 2>&1 | Out-Null
+        Write-Ok "Python dependencies installed"
+    } catch {
+        Write-Err "Failed to install Python dependencies"
+        exit 1
+    }
+
+    # Install Node.js dependencies
+    Write-Info "Installing Node.js dependencies..."
+    try {
+        Push-Location $hermesDir
+        npm install 2>&1 | Out-Null
+        Pop-Location
+        Write-Ok "Node.js dependencies installed"
+    } catch {
+        Write-Err "Failed to install Node.js dependencies"
+        exit 1
+    }
+
+    Write-Ok "Hermes Agent installed successfully"
 }
 
 # =============================================================================

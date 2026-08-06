@@ -242,10 +242,22 @@ if (Test-Path $hermesExe) {
     # Create virtual environment
     Write-Info "Creating Python virtual environment..."
     try {
-        & python -m venv (Join-Path $hermesDir "venv") 2>&1 | Out-Null
+        $pythonExe = Join-Path $env:USERPROFILE '.local\python\python.exe'
+        $venvDir = Join-Path $hermesDir "venv"
+        
+        # Python embeddable doesn't have venv module, use virtualenv instead
+        $pipPath = Join-Path $env:USERPROFILE '.local\python\Scripts\pip.exe'
+        & $pipPath install virtualenv 2>&1 | Out-Null
+        
+        $virtualenvPath = Join-Path $env:USERPROFILE '.local\python\Scripts\virtualenv.exe'
+        & $virtualenvPath $venvDir 2>&1 | Out-Null
+        
+        if (-not (Test-Path (Join-Path $venvDir "Scripts\python.exe"))) {
+            throw "Virtual environment creation failed"
+        }
         Write-Ok "Virtual environment created"
     } catch {
-        Write-Err "Failed to create virtual environment"
+        Write-Err "Failed to create virtual environment: $_"
         exit 1
     }
 
@@ -260,16 +272,51 @@ if (Test-Path $hermesExe) {
         exit 1
     }
 
-    # Install Node.js dependencies
+    # Install Node.js dependencies with retry (handles antivirus file locking)
     Write-Info "Installing Node.js dependencies..."
-    try {
-        Push-Location $hermesDir
-        npm install 2>&1 | Out-Null
-        Pop-Location
+    
+    # Helper function: npm install with retry
+    function Invoke-NpmWithRetry {
+        param([string]$Command, [int]$MaxRetries = 5)
+        $nodeModules = Join-Path $hermesDir 'node_modules'
+        for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
+            Write-Info "  Attempt $attempt of $MaxRetries..."
+            cmd /c "$Command 2>nul 1>nul"
+            if ($LASTEXITCODE -eq 0) { return $true }
+            if ($attempt -lt $MaxRetries) {
+                $delay = $attempt * 15
+                Write-Warn "  npm failed (antivirus may be locking files) -- Retrying in $delay seconds..."
+                Start-Sleep -Seconds $delay
+                # Clean corrupted node_modules before retry
+                if (Test-Path $nodeModules) {
+                    Remove-Item $nodeModules -Recurse -Force -ErrorAction SilentlyContinue
+                    Start-Sleep -Seconds 5
+                }
+            }
+        }
+        return $false
+    }
+    
+    Push-Location $hermesDir
+    
+    # Configure npm for corporate environment
+    cmd /c "npm.cmd config set fetch-retry-mintimeout 10000 2>nul"
+    cmd /c "npm.cmd config set fetch-retry-maxtimeout 120000 2>nul"
+    
+    # Try npm install with retry
+    $npmOk = Invoke-NpmWithRetry -Command 'npm.cmd install --no-fund --no-audit --prefer-offline'
+    if (-not $npmOk) {
+        Write-Warn "npm install failed -- Falling back to npm ci..."
+        $npmOk = Invoke-NpmWithRetry -Command 'npm.cmd ci --no-fund --no-audit'
+    }
+    
+    Pop-Location
+    
+    if ($npmOk) {
         Write-Ok "Node.js dependencies installed"
-    } catch {
-        Write-Err "Failed to install Node.js dependencies"
-        exit 1
+    } else {
+        Write-Warn "Node.js dependencies install had issues (antivirus may be blocking)"
+        Write-Info "You can manually run: cd $hermesDir && npm install --no-fund --no-audit"
     }
 
     Write-Ok "Hermes Agent installed successfully"

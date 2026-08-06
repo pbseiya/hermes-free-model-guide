@@ -166,14 +166,10 @@ hermes-free-model-guide/
 
 **วิธีที่ 1: One-Line Command (สั้น)**
 ```powershell
-# Basic uninstall
 irm https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1 | iex
-
-# Full uninstall (include agy and Node.js)
-irm https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1 | iex -RemoveAgy -RemoveNode -Force
 ```
 
-**วิธีที่ 2: Download then Run (เสถียรกว่า)**
+**วิธีที่ 2: Download then Run (เสถียรกว่า + รองรับ parameter)**
 ```powershell
 # Basic uninstall
 $f="$env:TEMP\hermes-uninstall.ps1"; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1' -OutFile $f -UseBasicParsing; powershell -ExecutionPolicy Bypass -File $f; Remove-Item $f

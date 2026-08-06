@@ -337,13 +337,28 @@ if (-not $SkipInstall) {
     # Helper: git clone with retry (handles antivirus/network issues)
     function Invoke-GitCloneWithRetry {
         param([string]$TargetDir, [int]$MaxRetries = 3)
+
+        # Ensure git is available in PATH
+        $env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path', 'User')
+        $gitAvailable = Get-Command git -ErrorAction SilentlyContinue
+        if (-not $gitAvailable) {
+            Write-Err "Git not found in PATH. Please install Git first."
+            return $false
+        }
+
         for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
             Write-Info "  Clone attempt $attempt of $MaxRetries..."
-            cmd /c "git clone --depth 1 https://github.com/NousResearch/hermes-agent.git `"$TargetDir`" 2>nul 1>nul"
+            if ($attempt -eq 1) {
+                # Show output on first attempt for debugging
+                & git clone --depth 1 https://github.com/NousResearch/hermes-agent.git $TargetDir 2>&1
+            } else {
+                # Hide output on retries
+                & git clone --depth 1 https://github.com/NousResearch/hermes-agent.git $TargetDir 2>&1 | Out-Null
+            }
             if ($LASTEXITCODE -eq 0) { return $true }
             if ($attempt -lt $MaxRetries) {
                 $delay = $attempt * 10
-                Write-Warn "  Clone failed -- Retrying in $delay seconds..."
+                Write-Warn "  Clone failed (exit code $LASTEXITCODE) -- Retrying in $delay seconds..."
                 Start-Sleep -Seconds $delay
                 # Clean up failed clone attempt
                 if (Test-Path $TargetDir) {

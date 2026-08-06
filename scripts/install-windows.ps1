@@ -468,14 +468,14 @@ if (-not $SkipInstall) {
         $venvPythonPath = Join-Path $venvScripts 'python.exe'
         $env:Path = $venvScripts + ';' + $env:Path
 
-        Write-Info 'Installing hermes-agent Python packages...'
+        Write-Info 'Installing hermes-agent Python packages (using uv pip)...'
         $installSets = @('[all]', '[messaging,dashboard,ext]', '[messaging]', '')
         $pipOk = $false
 
         foreach ($extra in $installSets) {
             $package = if ($extra) { ".$extra" } else { "." }
-            Write-Info "  Trying pip install -e $package..."
-            & $venvPythonPath -m pip install -e $package --quiet
+            Write-Info "  Trying uv pip install -e $package..."
+            uv pip install -e $package --python $venvPythonPath
             $exitCode = $LASTEXITCODE
 
             if ($exitCode -eq 0) {

@@ -21,6 +21,13 @@
 ## 🚀 ติดตั้งด่วน (One-Line)
 
 ### Windows (PowerShell)
+
+**วิธีที่ 1: สั้น (แนะนำ)**
+```powershell
+irm https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/install-windows.ps1 | iex
+```
+
+**วิธีที่ 2: ยาว (เสถียรกว่า สำหรับ interactive prompts)**
 ```powershell
 $f="$env:TEMP\hermes-install.ps1"; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/install-windows.ps1' -OutFile $f -UseBasicParsing; powershell -ExecutionPolicy Bypass -File $f; Remove-Item $f
 ```

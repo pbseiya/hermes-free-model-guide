@@ -334,21 +334,46 @@ if (-not $SkipInstall) {
     Write-Info 'Installing hermes-agent with full UI support...'
     Write-Host ''
 
+    # Helper: git clone with retry (handles antivirus/network issues)
+    function Invoke-GitCloneWithRetry {
+        param([string]$TargetDir, [int]$MaxRetries = 3)
+        for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
+            Write-Info "  Clone attempt $attempt of $MaxRetries..."
+            cmd /c "git clone --depth 1 https://github.com/NousResearch/hermes-agent.git `"$TargetDir`" 2>nul 1>nul"
+            if ($LASTEXITCODE -eq 0) { return $true }
+            if ($attempt -lt $MaxRetries) {
+                $delay = $attempt * 10
+                Write-Warn "  Clone failed -- Retrying in $delay seconds..."
+                Start-Sleep -Seconds $delay
+                # Clean up failed clone attempt
+                if (Test-Path $TargetDir) {
+                    Remove-Item $TargetDir -Recurse -Force -ErrorAction SilentlyContinue
+                    Start-Sleep -Seconds 2
+                }
+            }
+        }
+        return $false
+    }
+
     if (Test-Path $hermesInstallDir) {
         Write-Info 'Updating existing hermes-agent repository...'
+        $updateOk = $false
         try {
             Push-Location $hermesInstallDir
             git pull origin main 2>&1 | Out-Null
             Pop-Location
             Write-Ok 'Repository updated'
+            $updateOk = $true
         }
         catch {
             Write-Warn 'Git pull failed -- Reinstalling...'
-            Pop-Location
+            try { Pop-Location } catch { }
 
+            # Kill any git processes that might be holding the directory
             Get-Process git -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
             Start-Sleep -Seconds 2
 
+            # Remove directory with retry (use robocopy for ALL node_modules)
             $retryCount = 0
             while ((Test-Path $hermesInstallDir) -and ($retryCount -lt 5)) {
                 try {
@@ -376,10 +401,16 @@ if (-not $SkipInstall) {
             }
 
             if (Test-Path $hermesInstallDir) {
-                Write-Err "Cannot remove old hermes directory: $hermesInstallDir"
+                Write-Err "Cannot remove old hermes directory: $hermesInstallDir`nPlease close any running hermes processes and try again, or remove manually:`n  Remove-Item '$hermesInstallDir' -Recurse -Force"
             }
+        }
 
-            cmd /c "git clone --depth 1 https://github.com/NousResearch/hermes-agent.git `"$hermesInstallDir`" 2>nul 1>nul"
+        if (-not $updateOk) {
+            Write-Info 'Cloning hermes-agent repository (fresh install)...'
+            $cloneOk = Invoke-GitCloneWithRetry -TargetDir $hermesInstallDir
+            if (-not $cloneOk) {
+                Write-Err "Git clone failed after retries.`nPlease check your internet connection and try again."
+            }
         }
     }
     else {
@@ -388,12 +419,15 @@ if (-not $SkipInstall) {
         if (-not (Test-Path $hermesParentDir)) {
             New-Item -ItemType Directory -Path $hermesParentDir -Force | Out-Null
         }
-        cmd /c "git clone --depth 1 https://github.com/NousResearch/hermes-agent.git `"$hermesInstallDir`" 2>nul 1>nul"
+        $cloneOk = Invoke-GitCloneWithRetry -TargetDir $hermesInstallDir
+        if (-not $cloneOk) {
+            Write-Err "Git clone failed after retries.`nPlease check your internet connection and try again."
+        }
     }
 
     $gitDir = Join-Path $hermesInstallDir '.git'
     if (-not (Test-Path $gitDir)) {
-        Write-Err "Git clone failed -- hermes-agent directory is not a valid repository."
+        Write-Err "Git clone failed -- hermes-agent directory is not a valid repository.`nTry removing it manually: Remove-Item '$hermesInstallDir' -Recurse -Force`nThen run this script again."
     }
 
     Write-Info 'Setting up Python environment...'

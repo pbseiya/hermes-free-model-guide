@@ -103,11 +103,14 @@ hermes gateway start      # Telegram bot
 
 ### 📊 สรุป
 
-| สถานะ | ค่าที่ต้องใส่ |
-|-------|---------------|
-| **Minimal** | OKMD API Key เท่านั้น |
-| **Full setup** | OKMD + Telegram Bot + Chat ID |
-| **Course 0** | LiteLLM API Key (จาก instructor) |
+| สถานะ | ค่าที่ต้องใส่ | วิธีใส่ |
+|-------|---------------|---------|
+| **Minimal** | OKMD API Key เท่านั้น | แก้ `.env` โดยตรง หรือ `hermes env set` |
+| **Full setup** | OKMD + Telegram Bot + Chat ID | แก้ `.env` + `hermes gateway setup` |
+| **Course 0** | LiteLLM API Key (จาก instructor) | แก้ `.env` โดยตรง |
+
+**หมายเหตุ:** `hermes setup` ใช้ได้เฉพาะ built-in providers (OpenAI, Anthropic, etc.) เท่านั้น
+สำหรับ custom providers (OKMD, LiteLLM Proxy) ต้องตั้งค่าผ่านไฟล์ config โดยตรง
 
 ---
 

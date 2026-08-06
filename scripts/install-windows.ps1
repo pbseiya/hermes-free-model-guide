@@ -150,6 +150,65 @@ else {
 }
 
 # =============================================================================
+# Step 2.7: Install Python 3.11 (user-space, no admin required)
+# =============================================================================
+Write-Step "Step 2.7: Install Python"
+
+$pythonDir = Join-Path $env:USERPROFILE '.local\python'
+$pythonExe = Join-Path $pythonDir 'python.exe'
+
+if (Test-Path $pythonExe) {
+    $pythonVer = & $pythonExe --version 2>$null
+    Write-Ok "Python already installed: $pythonVer"
+} else {
+    Write-Info "Python not found -- Installing in user-space..."
+
+    # Download Python embeddable package
+    if (-not (Test-Path $pythonDir)) { New-Item -ItemType Directory -Path $pythonDir -Force | Out-Null }
+
+    $pythonUrl = 'https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip'
+    $pythonZip = Join-Path $pythonDir 'python.zip'
+
+    Write-Info "Downloading Python embeddable..."
+    try {
+        Invoke-WebRequest -Uri $pythonUrl -OutFile $pythonZip -UseBasicParsing
+        Write-Info "Extracting Python..."
+        Expand-Archive -Path $pythonZip -DestinationPath $pythonDir -Force
+        Remove-Item -Path $pythonZip -Force
+
+        # Enable pip by fixing python311._pth
+        $pthFile = Join-Path $pythonDir 'python311._pth'
+        if (Test-Path $pthFile) {
+            $pthContent = Get-Content $pthFile
+            $pthContent = $pthContent -replace '#import site', 'import site'
+            [System.IO.File]::WriteAllText($pthFile, ($pthContent -join "`r`n"))
+        }
+
+        # Install pip
+        $getPipUrl = 'https://bootstrap.pypa.io/get-pip.py'
+        $getPipFile = Join-Path $pythonDir 'get-pip.py'
+        Invoke-WebRequest -Uri $getPipUrl -OutFile $getPipFile -UseBasicParsing
+
+        Start-Process -FilePath $pythonExe -ArgumentList $getPipFile -Wait -NoNewWindow
+
+        # Add to PATH
+        $pythonScriptsDir = Join-Path $pythonDir 'Scripts'
+        $env:Path = $pythonDir + ';' + $pythonScriptsDir + ';' + $env:Path
+
+        # Add to User PATH permanently
+        $userPath = [System.Environment]::GetEnvironmentVariable('Path', 'User')
+        if ($userPath -notlike "*$pythonDir*") {
+            [System.Environment]::SetEnvironmentVariable('Path', ($pythonDir + ';' + $pythonScriptsDir + ';' + $userPath), 'User')
+        }
+
+        Write-Ok "Python embeddable installed"
+    }
+    catch {
+        Write-Err "Python installation failed: $_`nPlease check your internet connection and try again."
+    }
+}
+
+# =============================================================================
 # Step 3: Install Hermes Agent (local install, no admin required)
 # =============================================================================
 Write-Step "Step 3: Install Hermes Agent"

@@ -98,6 +98,58 @@ if ($nodeCmd) {
 }
 
 # =============================================================================
+# Step 2.5: Install Git (user-space, no admin required)
+# =============================================================================
+Write-Step "Step 2.5: Install Git"
+
+$gitCmd = Get-Command git -ErrorAction SilentlyContinue
+if (-not $gitCmd) {
+    Write-Info "Git not found -- Installing in user-space..."
+
+    # Downloading Git Portable
+    $gitDir = Join-Path $env:USERPROFILE '.local\git'
+    if (-not (Test-Path $gitDir)) { New-Item -ItemType Directory -Path $gitDir -Force | Out-Null }
+
+    $gitUrl = 'https://github.com/git-for-windows/git/releases/download/v2.47.1.windows.2/PortableGit-2.47.1.2-64-bit.7z.exe'
+    $gitExe = Join-Path $gitDir 'PortableGit.7z.exe'
+
+    Write-Info "Downloading Git Portable (this may take 1-2 minutes)..."
+    try {
+        Invoke-WebRequest -Uri $gitUrl -OutFile $gitExe -UseBasicParsing
+        Write-Info "Extracting Git..."
+        # Use proper argument format for 7z self-extracting archive
+        $extractArgs = "-o`"$gitDir`" -y"
+        Start-Process -FilePath $gitExe -ArgumentList $extractArgs -Wait -NoNewWindow
+
+        # Add to PATH
+        $gitBin = Join-Path $gitDir 'bin'
+        $gitCmdDir = Join-Path $gitDir 'cmd'
+        $env:Path = $gitBin + ';' + $gitCmdDir + ';' + $env:Path
+
+        # Add to User PATH permanently
+        $userPath = [System.Environment]::GetEnvironmentVariable('Path', 'User')
+        if ($userPath -notlike "*$gitDir*") {
+            [System.Environment]::SetEnvironmentVariable('Path', ($gitBin + ';' + $gitCmdDir + ';' + $userPath), 'User')
+        }
+
+        # Clean up installer
+        Remove-Item $gitExe -Force -ErrorAction SilentlyContinue
+
+        Write-Ok "Git Portable installed"
+
+        # Refresh PATH immediately so git is available in this session
+        $env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path', 'User')
+    }
+    catch {
+        Write-Err "Git download failed: $_`nPlease check your internet connection and try again."
+    }
+}
+else {
+    $gitVer = (git --version) -replace 'git version ', ''
+    Write-Ok "git $gitVer"
+}
+
+# =============================================================================
 # Step 3: Install Hermes Agent (local install, no admin required)
 # =============================================================================
 Write-Step "Step 3: Install Hermes Agent"
@@ -110,14 +162,6 @@ if (Test-Path $hermesExe) {
     Write-Ok "Hermes already installed: $hermesVer"
 } else {
     Write-Info "Installing Hermes Agent (user-space, no admin required)..."
-
-    # Check if git is available
-    $gitCmd = Get-Command git -ErrorAction SilentlyContinue
-    if (-not $gitCmd) {
-        Write-Err "Git not found. Please install Git first:"
-        Write-Host "  Download from: https://git-scm.com/download/win" -ForegroundColor Yellow
-        exit 1
-    }
 
     # Clone hermes-agent repo
     Write-Info "Cloning hermes-agent repository..."

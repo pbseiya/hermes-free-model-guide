@@ -58,17 +58,36 @@ curl -fsSL https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/mai
 
 ### 🔄 ขั้นตอนหลังติดตั้ง
 
-```bash
-# 1. ถ้าไม่ได้ใส่ค่าตอน install → ใส่ทีหลังได้
-hermes setup
+<div class="warning">
 
-# 2. หรือเปลี่ยน model/provider
+**⚠️ สำคัญ:** `hermes setup` **ไม่ถาม API key สำหรับ custom provider** (OKMD เป็น custom provider)
+
+ต้องใส่ API key ด้วยวิธีต่อไปนี้เท่านั้น:
+
+</div>
+
+```bash
+# 1. ใส่ OKMD API Key (เลือกวิธีใดวิธีหนึ่ง)
+# วิธีที่ 1: แก้ไฟล์ .env โดยตรง
+nano ~/.hermes/.env
+# เพิ่ม: OKMD_API_KEY=sk_YOUR_KEY_HERE
+
+# วิธีที่ 2: ใช้คำสั่ง
+hermes env set OKMD_API_KEY sk_YOUR_KEY_HERE
+
+# วิธีที่ 3: เพิ่มบรรทัดด้วย echo
+echo "OKMD_API_KEY=sk_YOUR_KEY_HERE" >> ~/.hermes/.env
+
+# 2. ตรวจสอบว่า API key ถูกใส่แล้ว
+cat ~/.hermes/.env | grep OKMD_API_KEY
+
+# 3. เปลี่ยน model/provider (ถ้าต้องการ)
 hermes model
 
-# 3. ตรวจสอบว่าทำงานได้
+# 4. ตรวจสอบว่าทำงานได้
 hermes doctor
 
-# 4. เริ่มใช้งาน
+# 5. เริ่มใช้งาน
 hermes                    # CLI chat
 hermes desktop            # Desktop app
 hermes dashboard          # Web dashboard (http://localhost:9119)

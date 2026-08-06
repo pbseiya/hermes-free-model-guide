@@ -287,19 +287,34 @@ hermes --version
 
 ## Step 4: เชื่อม Hermes กับ OKMD API
 
-### วิธีที่ 1: ใช้คำสั่ง (แนะนำ)
+### วิธีที่ 1: ใส่ในไฟล์ .env (แนะนำ)
 
 ```bash
-# เปิด interactive setup
-hermes setup
+# แก้ไขไฟล์ .env
+nano ~/.hermes/.env
+
+# เพิ่มบรรทัดนี้
+OKMD_API_KEY=sk_YOUR_KEY_HERE
 ```
 
-เลือก:
-1. **Provider** → Custom endpoint
-2. **Base URL** → `https://gen.ai.kku.ac.th/okmd/api/v1`
-3. **API Key** → วาง OKMD key ที่ copy มา
-4. **Model** → `gpt-4o-mini` (แนะนำ — 350K quota)
-   หรือ `deepseek-chat` (1M quota เยอะสุด)
+### วิธีที่ 2: ใช้คำสั่ง hermes env set
+
+```bash
+hermes env set OKMD_API_KEY sk_YOUR_KEY_HERE
+```
+
+### วิธีที่ 3: เพิ่มบรรทัดด้วย echo
+
+```bash
+echo "OKMD_API_KEY=sk_YOUR_KEY_HERE" >> ~/.hermes/.env
+```
+
+### ตรวจสอบว่าใส่ถูกต้อง
+
+```bash
+cat ~/.hermes/.env | grep OKMD_API_KEY
+# ควรเห็น: OKMD_API_KEY=sk_...
+```
 
 ### วิธีที่ 2: แก้ config เอง
 
@@ -1251,20 +1266,36 @@ tail ~/.hermes/logs/gateway.log
 
 ### ใส่ค่าทีหลัง (ถ้าไม่ได้ใส่ตอน install)
 
-```bash
-# 1. ตั้งค่า OKMD API Key
-hermes setup
-# เลือก Provider → Custom endpoint
-# Base URL → https://gen.ai.kku.ac.th/okmd/api/v1
-# API Key → วาง OKMD key
+<div class="warning">
 
-# 2. หรือเปลี่ยน model/provider
+**⚠️ สำคัญ:** `hermes setup` **ไม่ถาม API key สำหรับ custom provider** (OKMD เป็น custom provider)
+
+ต้องใส่ API key ด้วยวิธีต่อไปนี้เท่านั้น:
+
+</div>
+
+```bash
+# 1. ใส่ OKMD API Key (เลือกวิธีใดวิธีหนึ่ง)
+# วิธีที่ 1: แก้ไฟล์ .env โดยตรง
+nano ~/.hermes/.env
+# เพิ่ม: OKMD_API_KEY=sk_YOUR_KEY_HERE
+
+# วิธีที่ 2: ใช้คำสั่ง
+hermes env set OKMD_API_KEY sk_YOUR_KEY_HERE
+
+# วิธีที่ 3: เพิ่มบรรทัดด้วย echo
+echo "OKMD_API_KEY=sk_YOUR_KEY_HERE" >> ~/.hermes/.env
+
+# 2. ตรวจสอบว่า API key ถูกใส่แล้ว
+cat ~/.hermes/.env | grep OKMD_API_KEY
+
+# 3. เปลี่ยน model/provider (ถ้าต้องการ)
 hermes model
 
-# 3. ตรวจสอบว่าทำงานได้
+# 4. ตรวจสอบว่าทำงานได้
 hermes doctor
 
-# 4. เริ่มใช้งาน
+# 5. เริ่มใช้งาน
 hermes                    # CLI chat
 hermes desktop            # Desktop app
 hermes dashboard          # Web dashboard (http://localhost:9119)

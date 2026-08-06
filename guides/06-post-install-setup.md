@@ -45,19 +45,15 @@
 
 ### ขั้นตอนที่ 2: ใส่ API Key
 
-**วิธีที่ 1: ใช้ hermes setup (แนะนำ)**
+<div class="warning">
 
-```bash
-hermes setup
-```
+**⚠️ สำคัญ:** `hermes setup` **ไม่ถาม API key สำหรับ custom provider** (OKMD เป็น custom provider)
 
-เลือก:
-1. **Provider** → Custom endpoint
-2. **Base URL** → `https://gen.ai.kku.ac.th/okmd/api/v1`
-3. **API Key** → วาง OKMD key
-4. **Model** → `deepseek-v3.2` (หรือ model อื่น)
+ต้องใส่ API key ด้วยวิธีต่อไปนี้เท่านั้น:
 
-**วิธีที่ 2: แก้ไฟล์ .env โดยตรง**
+</div>
+
+**วิธีที่ 1: แก้ไฟล์ .env โดยตรง (แนะนำ)**
 
 ```bash
 # เปิดไฟล์ .env
@@ -65,19 +61,31 @@ nano ~/.hermes/.env
 
 # เพิ่มบรรทัดนี้
 OKMD_API_KEY=sk_YOUR_KEY_HERE
+
+# บันทึกไฟล์ (Ctrl+X, Y, Enter)
 ```
 
-**วิธีที่ 3: ใช้คำสั่ง**
+**วิธีที่ 2: ใช้คำสั่ง hermes env set**
 
 ```bash
 hermes env set OKMD_API_KEY sk_YOUR_KEY_HERE
 ```
 
-### ขั้นตอนที่ 3: ตรวจสอบ
+**วิธีที่ 3: เพิ่มบรรทัดด้วย echo**
 
 ```bash
+echo "OKMD_API_KEY=sk_YOUR_KEY_HERE" >> ~/.hermes/.env
+```
+
+### ขั้นตอนที่ 3: ตรวจสอบการตั้งค่า
+
+```bash
+# ตรวจสอบว่า API key ถูกใส่ใน .env แล้ว
+cat ~/.hermes/.env | grep OKMD_API_KEY
+# ควรเห็น: OKMD_API_KEY=sk_...
+
 # ทดสอบว่า API Key ใช้งานได้
-hermes chat
+hermes
 
 # พิมพ์อะไรก็ได้
 You: สวัสดี

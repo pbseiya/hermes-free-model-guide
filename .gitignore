@@ -28,6 +28,40 @@ venv/
 slides/*.pdf
 slides/*.pptx
 slides/*.html
+slides/rendered/
+slides/slides.*.png
+slides/title-slide-*.png
+slides/post-install-preview.html
+
+# Generated slide artifacts
+slide1-*.png
+slide1-*.jpg
+slides-all.*
+pptx-slide*.png
+comparison-*.png
+comparison-*.jpg
+overlay-*.png
+overlay-*.jpg
+diff-map-*.jpg
+
+# Script generators (temporary)
+create-slides*.js
+
+# Iterative design folders
+marp-comparison/
+marp-v2/
+
+# PPTX/PDF exports
+hermes-slides-*.pptx
+hermes-slides-*.pdf
+hermes-slides-pptx.*
 
 # Logs
 *.log
+
+# Rendered images folder
+images/*.jpg
+images/*.png
+images/*.webp
+images/*.ico
+!images/.gitkeep

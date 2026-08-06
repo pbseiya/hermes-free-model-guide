@@ -70,7 +70,7 @@ OKMD_API_KEY=sk_YOUR_KEY_HERE
 **วิธีที่ 3: ใช้คำสั่ง**
 
 ```bash
-hermes config set providers.okmd.api_key sk_YOUR_KEY_HERE
+hermes env set OKMD_API_KEY sk_YOUR_KEY_HERE
 ```
 
 ### ขั้นตอนที่ 3: ตรวจสอบ

@@ -1,6 +1,8 @@
 # =============================================================================
-# Hermes Agent Uninstall Script (Windows PowerShell)
-# Removes: Hermes Agent, services, startup scripts, PATH entries
+# Hermes Agent Quick Uninstall (User-Space -- No Admin)
+# For hermes-free-model-guide (OKMD Free Models)
+# =============================================================================
+# Usage: irm https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/uninstall-windows.ps1 | iex
 # =============================================================================
 
 param(
@@ -9,217 +11,201 @@ param(
     [switch]$Force
 )
 
-$ErrorActionPreference = "Continue"
+$ErrorActionPreference = 'Continue'
 
-# Colors for output
-function Write-Info    { param($msg) Write-Host "[INFO] " -ForegroundColor Cyan -NoNewline; Write-Host $msg }
-function Write-Ok      { param($msg) Write-Host "[OK] " -ForegroundColor Green -NoNewline; Write-Host $msg }
-function Write-Warn    { param($msg) Write-Host "[!] " -ForegroundColor Yellow -NoNewline; Write-Host $msg }
-function Write-Err     { param($msg) Write-Host "[ERROR] " -ForegroundColor Red -NoNewline; Write-Host $msg }
-function Write-Step    { param($msg) Write-Host "`n━━━ $msg ━━━" -ForegroundColor Magenta }
-
-# Banner
-Write-Host ""
-Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Red
-Write-Host "║              Hermes Agent Uninstaller                    ║" -ForegroundColor Red
-Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Red
-Write-Host ""
-
-if (-not $Force) {
-    Write-Host "⚠️  This will remove:" -ForegroundColor Yellow
-    Write-Host "  • Hermes Agent and all configuration" -ForegroundColor White
-    Write-Host "  • Startup services (Desktop, Dashboard, Telegram)" -ForegroundColor White
-    Write-Host "  • ~/.hermes directory (sessions, logs, config)" -ForegroundColor White
-    Write-Host ""
-    
-    $confirm = Read-Host "Are you sure you want to uninstall? (y/N)"
-    if ($confirm -ne 'y' -and $confirm -ne 'Y') {
-        Write-Info "Uninstallation cancelled"
-        exit 0
-    }
-}
-
-# =============================================================================
-# Step 1: Stop Running Services
-# =============================================================================
-Write-Step "Step 1: Stop Running Services"
-
-# Stop Task Scheduler tasks
+# Increase console buffer size for longer history
 try {
-    schtasks /End /TN "HermesGateway" 2>$null | Out-Null
-    schtasks /End /TN "HermesDashboard" 2>$null | Out-Null
-    schtasks /End /TN "HermesDesktop" 2>$null | Out-Null
-    Write-Ok "Stopped Task Scheduler tasks"
+    $buffer = $host.UI.RawUI.BufferSize
+    $buffer.Height = 9999
+    $host.UI.RawUI.BufferSize = $buffer
 } catch {
-    Write-Warn "Could not stop Task Scheduler tasks"
+    # Ignore if not supported (e.g., when piped)
 }
 
-# Stop running processes
-$hermesProcs = Get-Process -Name "hermes*","node*","agy*" -ErrorAction SilentlyContinue
-if ($hermesProcs) {
-    $hermesProcs | Stop-Process -Force -ErrorAction SilentlyContinue
-    Write-Ok "Stopped running Hermes processes"
-} else {
-    Write-Info "No running Hermes processes found"
+# --- Timing helpers ---
+$script:StartTime = Get-Date
+$script:StepStartTime = Get-Date
+
+function Write-Ok   { param($msg) Write-Host "[OK] $msg" -ForegroundColor Green }
+function Write-Info  { param($msg) Write-Host "[INFO] $msg" -ForegroundColor Cyan }
+function Write-Warn  { param($msg) Write-Host "[!] $msg" -ForegroundColor Yellow }
+function Write-Step  {
+    param($msg)
+    $elapsed = (Get-Date) - $script:StepStartTime
+    $elapsedStr = '{0:mm\:ss}' -f $elapsed
+    Write-Host ("`n=== {0} === [{1}]" -f $msg, $elapsedStr) -ForegroundColor Magenta
+    $script:StepStartTime = Get-Date
+}
+function Write-Elapsed {
+    $elapsed = (Get-Date) - $script:StartTime
+    $elapsedStr = '{0:mm\:ss}' -f $elapsed
+    Write-Host "[TIME] Total elapsed: $elapsedStr" -ForegroundColor DarkGray
 }
 
-# =============================================================================
-# Step 2: Remove Task Scheduler Tasks
-# =============================================================================
-Write-Step "Step 2: Remove Task Scheduler Tasks"
+# Helper: Fast directory removal
+function Remove-Fast {
+    param([string]$Path)
+    if (-not (Test-Path $Path)) { return }
 
-$tasks = @("HermesGateway", "HermesDashboard", "HermesDesktop")
-foreach ($task in $tasks) {
-    try {
-        schtasks /Delete /TN $task /F 2>$null | Out-Null
-        Write-Ok "Removed task: $task"
-    } catch {
-        Write-Warn "Task not found: $task"
+    # For node_modules with long paths, use robocopy trick
+    if ($Path -like '*node_modules*') {
+        $emptyDir = Join-Path $env:TEMP "empty_for_rmdir_$([guid]::NewGuid().ToString('N').Substring(0,8))"
+        if (-not (Test-Path $emptyDir)) {
+            New-Item -ItemType Directory -Path $emptyDir -Force | Out-Null
+        }
+        # Use /PURGE instead of /MIR, redirect all output
+        cmd /c "robocopy `"$emptyDir`" `"$Path`" /PURGE /NFL /NDL /NJH /NJS /nc /ns /np /nfl /ndl" 2>&1 | Out-Null
+        Remove-Item $emptyDir -Force -ErrorAction SilentlyContinue
     }
+
+    # Remove the directory
+    Remove-Item $Path -Force -Recurse -ErrorAction SilentlyContinue
 }
 
-# =============================================================================
-# Step 3: Remove Startup Shortcuts
-# =============================================================================
-Write-Step "Step 3: Remove Startup Shortcuts"
+Write-Host ''
+Write-Host '============================================================' -ForegroundColor Cyan
+Write-Host '   Hermes Agent Quick Uninstall (User-Space -- No Admin)' -ForegroundColor Cyan
+Write-Host '   For hermes-free-model-guide (OKMD Free Models)' -ForegroundColor Cyan
+Write-Host '============================================================' -ForegroundColor Cyan
+Write-Host ''
 
-$startupFolder = $env:APPDATA + '\Microsoft\Windows\Start Menu\Programs\Startup'
-$shortcuts = @("HermesGateway.lnk", "HermesDashboard.lnk", "HermesDesktop.lnk")
+# --- Step 1: Stop running processes ---
+Write-Step 'Step 1: Stop running processes'
 
-foreach ($shortcut in $shortcuts) {
-    $shortcutPath = Join-Path $startupFolder $shortcut
-    if (Test-Path $shortcutPath) {
-        Remove-Item $shortcutPath -Force
-        Write-Ok "Removed: $shortcut"
+Get-Process -Name 'hermes','Hermes','pythonw' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process | Where-Object {
+    $_.Path -like '*hermes*' -and $_.ProcessName -ne 'powershell'
+} | Stop-Process -Force -ErrorAction SilentlyContinue
+Start-Sleep -Seconds 2
+Write-Ok 'Processes stopped'
+
+# --- Step 2: Remove scheduled tasks ---
+Write-Step 'Step 2: Remove scheduled tasks'
+
+schtasks /Delete /TN 'HermesGateway' /F 2>$null
+schtasks /Delete /TN 'HermesDashboard' /F 2>$null
+schtasks /Delete /TN 'Hermes_Gateway' /F 2>$null
+schtasks /Delete /TN 'Hermes_Dashboard' /F 2>$null
+Write-Ok 'Scheduled tasks removed'
+
+# --- Step 3: Remove startup shortcuts ---
+Write-Step 'Step 3: Remove startup shortcuts'
+
+$startupDir = [System.Environment]::GetFolderPath('Startup')
+Get-ChildItem -Path $startupDir -Filter 'Hermes*' -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+Write-Ok 'Startup shortcuts removed'
+
+# --- Step 4: Remove hermes installation ---
+Write-Step 'Step 4: Remove hermes installation'
+
+$hermesDir = Join-Path $env:LOCALAPPDATA 'hermes'
+if (Test-Path $hermesDir) {
+    Write-Info 'Removing hermes directory...'
+    Remove-Item $hermesDir -Recurse -Force -ErrorAction SilentlyContinue
+    if (-not (Test-Path $hermesDir)) {
+        Write-Ok 'Hermes removed'
     } else {
-        Write-Info "Not found: $shortcut"
-    }
-}
-
-# =============================================================================
-# Step 4: Remove Hermes Installation
-# =============================================================================
-Write-Step "Step 4: Remove Hermes Installation"
-
-# Remove ~/.hermes directory
-$hermesHome = Join-Path $env:USERPROFILE ".hermes"
-if (Test-Path $hermesHome) {
-    Write-Info "Removing $hermesHome..."
-    Remove-Item $hermesHome -Recurse -Force -ErrorAction SilentlyContinue
-    if (-not (Test-Path $hermesHome)) {
-        Write-Ok "Removed: $hermesHome"
-    } else {
-        Write-Warn "Could not fully remove $hermesHome (some files may be locked)"
+        Write-Warn 'Some files could not be removed -- close all hermes processes and try again'
     }
 } else {
-    Write-Info "~/.hermes not found"
+    Write-Info 'Hermes not found -- skipping'
 }
 
-# Remove hermes from npm global
-$npmGlobal = Join-Path $env:USERPROFILE ".npm-global"
-if (Test-Path (Join-Path $npmGlobal "hermes.cmd")) {
-    Write-Info "Uninstalling hermes from npm..."
-    try {
-        npm uninstall -g hermes-agent 2>$null | Out-Null
-        Write-Ok "Uninstalled hermes-agent from npm"
-    } catch {
-        Write-Warn "Could not uninstall from npm"
-    }
-}
+# --- Step 5: Remove portable tools ---
+Write-Step 'Step 5: Remove portable tools'
 
-# Remove hermes binary from ~/.local/bin
-$localBin = Join-Path $env:USERPROFILE ".local\bin"
-if (Test-Path (Join-Path $localBin "hermes.cmd")) {
-    Remove-Item (Join-Path $localBin "hermes.cmd") -Force
-    Write-Ok "Removed hermes.cmd from ~/.local/bin"
-}
-
-# =============================================================================
-# Step 5: Remove PATH Entries
-# =============================================================================
-Write-Step "Step 5: Remove PATH Entries"
-
-$userPath = [System.Environment]::GetEnvironmentVariable('Path', 'User')
-$pathsToRemove = @(
-    (Join-Path $env:USERPROFILE ".npm-global"),
-    (Join-Path $env:USERPROFILE ".local\node"),
-    (Join-Path $env:USERPROFILE ".local\bin"),
-    (Join-Path $env:LOCALAPPDATA "agy\bin")
+$dirsToRemove = @(
+    @{ Name = 'Node.js'; Path = Join-Path $env:USERPROFILE '.local\node'; Remove = $RemoveNode }
+    @{ Name = 'Git'; Path = Join-Path $env:USERPROFILE '.local\git'; Remove = $true }
+    @{ Name = 'Python'; Path = Join-Path $env:USERPROFILE '.local\python'; Remove = $true }
+    @{ Name = 'uv'; Path = Join-Path $env:USERPROFILE '.local\bin'; Remove = $true }
+    @{ Name = 'Antigravity (agy)'; Path = Join-Path $env:LOCALAPPDATA 'agy'; Remove = $RemoveAgy }
 )
 
-$pathModified = $false
-foreach ($p in $pathsToRemove) {
-    if ($userPath -like "*$p*") {
-        $userPath = $userPath -replace [regex]::Escape("$p;"), ""
-        $userPath = $userPath -replace [regex]::Escape(";$p"), ""
-        $userPath = $userPath -replace [regex]::Escape($p), ""
-        $pathModified = $true
-        Write-Ok "Removed from PATH: $p"
-    }
-}
-
-if ($pathModified) {
-    [System.Environment]::SetEnvironmentVariable('Path', $userPath, 'User')
-    Write-Ok "Updated user PATH"
-} else {
-    Write-Info "No PATH entries to remove"
-}
-
-# =============================================================================
-# Step 6: Optional - Remove agy
-# =============================================================================
-if ($RemoveAgy) {
-    Write-Step "Step 6: Remove Antigravity CLI (agy)"
-    
-    $agyDir = Join-Path $env:LOCALAPPDATA "agy"
-    if (Test-Path $agyDir) {
-        Remove-Item $agyDir -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Ok "Removed: $agyDir"
+foreach ($dir in $dirsToRemove) {
+    if ($dir.Remove -or $Force) {
+        if (Test-Path $dir.Path) {
+            Remove-Item $dir.Path -Recurse -Force -ErrorAction SilentlyContinue
+            if (-not (Test-Path $dir.Path)) {
+                Write-Ok "$($dir.Name) removed"
+            } else {
+                Write-Warn "$($dir.Name) -- some files locked"
+            }
+        } else {
+            Write-Info "$($dir.Name) not found -- skipping"
+        }
     } else {
-        Write-Info "agy not found"
+        Write-Info "$($dir.Name) -- skipping (use -RemoveAgy or -RemoveNode to remove)"
     }
-} else {
-    Write-Step "Step 6: Skip agy Removal"
-    Write-Info "To remove agy, run with -RemoveAgy flag"
 }
 
-# =============================================================================
-# Step 7: Optional - Remove Node.js
-# =============================================================================
-if ($RemoveNode) {
-    Write-Step "Step 7: Remove Node.js (Portable)"
-    
-    $nodeDir = Join-Path $env:USERPROFILE ".local\node"
-    if (Test-Path $nodeDir) {
-        Remove-Item $nodeDir -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Ok "Removed: $nodeDir"
-    } else {
-        Write-Info "Node.js portable not found"
-    }
-} else {
-    Write-Step "Step 7: Skip Node.js Removal"
-    Write-Info "To remove Node.js, run with -RemoveNode flag"
+# Clean empty .local directory
+$localDir = Join-Path $env:USERPROFILE '.local'
+if ((Test-Path $localDir) -and ((Get-ChildItem $localDir -ErrorAction SilentlyContinue).Count -eq 0)) {
+    Remove-Item $localDir -Force -ErrorAction SilentlyContinue
 }
 
-# =============================================================================
-# Done!
-# =============================================================================
-Write-Host ""
-Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║              ✓ Uninstallation Complete!                  ║" -ForegroundColor Green
-Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Green
-Write-Host ""
-Write-Host "📝 What was removed:" -ForegroundColor Cyan
-Write-Host "  ✓ Hermes Agent and configuration" -ForegroundColor White
-Write-Host "  ✓ Startup services (Desktop, Dashboard, Telegram)" -ForegroundColor White
-Write-Host "  ✓ ~/.hermes directory" -ForegroundColor White
-Write-Host "  ✓ PATH entries" -ForegroundColor White
-if ($RemoveAgy) {
-    Write-Host "  ✓ Antigravity CLI (agy)" -ForegroundColor White
+# --- Step 6: Clean PATH ---
+Write-Step 'Step 6: Clean PATH environment variables'
+
+$userPath = [System.Environment]::GetEnvironmentVariable('Path', 'User')
+$pathParts = $userPath -split ';' | Where-Object {
+    $_ -ne '' -and
+    $_ -notlike '*\.local\python*' -and
+    $_ -notlike '*\.local\node*' -and
+    $_ -notlike '*\.local\git*' -and
+    $_ -notlike '*\.local\bin*' -and
+    $_ -notlike '*\hermes*' -and
+    $_ -notlike '*\agy*' -and
+    $_ -notlike '*\nvm*' -and
+    $_ -notlike '*\npm-global*'
 }
-if ($RemoveNode) {
-    Write-Host "  ✓ Node.js (portable)" -ForegroundColor White
+$cleanPath = $pathParts -join ';'
+if ($cleanPath -ne $userPath) {
+    [System.Environment]::SetEnvironmentVariable('Path', $cleanPath, 'User')
+    Write-Ok 'PATH cleaned'
+} else {
+    Write-Info 'PATH already clean'
 }
-Write-Host ""
-Write-Host "🔄 Restart your terminal to apply PATH changes" -ForegroundColor Yellow
-Write-Host ""
+
+# --- Step 7: Clean npm cache ---
+Write-Step 'Step 7: Clean npm cache'
+
+$npmCache = Join-Path $env:LOCALAPPDATA 'npm-cache'
+if (Test-Path $npmCache) {
+    Remove-Fast -Path $npmCache
+    Write-Ok 'npm cache removed'
+} else {
+    Write-Info 'npm cache not found -- skipping'
+}
+
+# --- Cleanup temp ---
+Remove-Item (Join-Path $env:TEMP 'empty_for_rmdir') -Force -ErrorAction SilentlyContinue
+Remove-Item (Join-Path $env:TEMP 'empty_for_uninstall') -Force -ErrorAction SilentlyContinue
+
+# --- Summary ---
+Write-Host ''
+Write-Host '============================================================' -ForegroundColor Green
+Write-Host '                 Uninstall Complete!                        ' -ForegroundColor Green
+Write-Host '============================================================' -ForegroundColor Green
+Write-Elapsed
+Write-Host ''
+Write-Host 'Removed:' -ForegroundColor Cyan
+Write-Host '  - Hermes Agent + all data' -ForegroundColor White
+Write-Host '  - Git, Python (portable)' -ForegroundColor White
+Write-Host '  - uv' -ForegroundColor White
+if ($RemoveNode -or $Force) {
+    Write-Host '  - Node.js (portable)' -ForegroundColor White
+}
+if ($RemoveAgy -or $Force) {
+    Write-Host '  - Antigravity CLI (agy)' -ForegroundColor White
+}
+Write-Host '  - Scheduled tasks + startup shortcuts' -ForegroundColor White
+Write-Host '  - PATH entries' -ForegroundColor White
+Write-Host '  - npm cache' -ForegroundColor White
+Write-Host ''
+Write-Host 'To reinstall, open a NEW PowerShell window and run:' -ForegroundColor Cyan
+Write-Host '  irm https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/install-windows.ps1 | iex' -ForegroundColor Yellow
+Write-Host ''
+
+Read-Host 'Press Enter to close this window'

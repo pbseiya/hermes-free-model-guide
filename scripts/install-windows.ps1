@@ -689,7 +689,7 @@ if (-not [string]::IsNullOrWhiteSpace($OKMDKey)) {
     Write-Info 'Querying available models from OKMD...'
     try {
         $headers = @{ 'Authorization' = "Bearer $OKMDKey" }
-        $modelsResponse = Invoke-WebRequest -Uri 'https://playground.okmd.or.th/v1/models' -Headers $headers -UseBasicParsing -TimeoutSec 15
+        $modelsResponse = Invoke-WebRequest -Uri 'https://gen.ai.kku.ac.th/okmd/api/v1/models' -Headers $headers -UseBasicParsing -TimeoutSec 15
         $modelsData = $modelsResponse.Content | ConvertFrom-Json
         if ($modelsData.data) {
             foreach ($m in $modelsData.data) {
@@ -836,7 +836,7 @@ if (Test-Path $envFile) {
 $primaryProvider = 'okmd'
 $primaryKey = $OKMDKey
 $primaryModels = $OKMDModels
-$primaryBaseUrl = 'https://playground.okmd.or.th/v1'
+$primaryBaseUrl = 'https://gen.ai.kku.ac.th/okmd/api/v1'
 $primaryDefaultModel = 'deepseek-v4-flash'
 
 if ([string]::IsNullOrWhiteSpace($OKMDKey) -and -not [string]::IsNullOrWhiteSpace($LiteLLMKey)) {

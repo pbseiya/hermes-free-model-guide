@@ -535,10 +535,10 @@ if (-not $SkipInstall) {
             return $false
         }
 
-        $npmOk = Invoke-NpmWithRetry -Command 'npm.cmd install --no-fund --no-audit'
+        $npmOk = Invoke-NpmWithRetry -Command 'npm.cmd ci --no-fund --no-audit'
         if (-not $npmOk) {
-            Write-Warn 'npm install failed -- Falling back to npm ci...'
-            $npmOk = Invoke-NpmWithRetry -Command 'npm.cmd ci --no-fund --no-audit'
+            Write-Warn 'npm ci failed -- Falling back to npm install...'
+            $npmOk = Invoke-NpmWithRetry -Command 'npm.cmd install --no-fund --no-audit'
         }
         if ($npmOk) {
             Write-Ok 'Node.js dependencies installed'
@@ -1159,7 +1159,7 @@ Write-Host 'If dashboard/desktop fails (antivirus issue):' -ForegroundColor Yell
 Write-Host '  1. Temporarily disable antivirus real-time protection' -ForegroundColor White
 Write-Host '  2. Open PowerShell and run:' -ForegroundColor White
 Write-Host '     cd $env:LOCALAPPDATA\hermes\hermes-agent' -ForegroundColor White
-Write-Host '     npm install --no-fund --no-audit' -ForegroundColor White
+Write-Host '     npm ci --no-fund --no-audit' -ForegroundColor White
 Write-Host '     npm install --workspace web --no-fund --no-audit' -ForegroundColor White
 Write-Host '     npm run build -w web' -ForegroundColor White
 Write-Host '  3. Re-enable antivirus' -ForegroundColor White

@@ -883,7 +883,10 @@ $primaryModels = $OKMDModels
 $primaryBaseUrl = 'https://gen.ai.kku.ac.th/okmd/api/v1'
 $primaryDefaultModel = 'deepseek-v4-flash'
 
-if ([string]::IsNullOrWhiteSpace($OKMDKey) -and -not [string]::IsNullOrWhiteSpace($LiteLLMKey)) {
+$hasOKMD = -not [string]::IsNullOrWhiteSpace($OKMDKey)
+$hasLiteLLM = -not [string]::IsNullOrWhiteSpace($LiteLLMKey)
+
+if (-not $hasOKMD -and $hasLiteLLM) {
     $primaryProvider = 'litellm'
     $primaryKey = $LiteLLMKey
     $primaryModels = $LiteLLMModels
@@ -923,12 +926,12 @@ if (Test-Path $configFile) {
     Write-Info 'Backed up original config.yaml'
 }
 
-# Build models section
-$modelsSection = ""
+# Build models section for primary provider
+$primaryModelsSection = ""
 if ($primaryModels.Count -gt 0) {
     foreach ($modelId in $primaryModels) {
-        $modelsSection += "      ${modelId}:`n"
-        $modelsSection += "        context_length: 1000000`n"
+        $primaryModelsSection += "      ${modelId}:`n"
+        $primaryModelsSection += "        context_length: 1000000`n"
     }
 }
 else {
@@ -945,15 +948,56 @@ else {
         'mistral-medium-3.1'
     )
     foreach ($modelId in $defaultModels) {
-        $modelsSection += "      ${modelId}:`n"
-        $modelsSection += "        context_length: 1000000`n"
+        $primaryModelsSection += "      ${modelId}:`n"
+        $primaryModelsSection += "        context_length: 1000000`n"
     }
 }
 
-$configContent = @"
+# Build models section for secondary provider (if both keys provided)
+$secondaryProvider = ''
+$secondaryKey = ''
+$secondaryBaseUrl = ''
+$secondaryDefaultModel = ''
+$secondaryModelsSection = ''
+
+if ($hasOKMD -and $hasLiteLLM) {
+    # OKMD is primary, LiteLLM is secondary
+    $secondaryProvider = 'litellm'
+    $secondaryKey = $LiteLLMKey
+    $secondaryBaseUrl = 'https://litellm-proxy-gateway.pbseiyacpro7.workers.dev/v1'
+    $secondaryDefaultModel = 'qwen3.7-plus'
+    
+    if ($LiteLLMModels.Count -gt 0) {
+        foreach ($modelId in $LiteLLMModels) {
+            $secondaryModelsSection += "      ${modelId}:`n"
+            $secondaryModelsSection += "        context_length: 1000000`n"
+        }
+    }
+    else {
+        # Default LiteLLM models
+        $defaultLiteLLMModels = @(
+            'qwen3.7-plus', 'qwen3.6-plus', 'qwen3.5-plus',
+            'glm-5', 'glm-4.7', 'kimi-k2.5', 'MiniMax-M2.5',
+            'qwen3-coder-plus', 'qwen3-coder-next', 'qwen3-max-2026-01-23',
+            'anthropic/qwen3.7-plus', 'anthropic/qwen3.6-plus', 'anthropic/qwen3.5-plus',
+            'anthropic/glm-5', 'anthropic/glm-4.7', 'anthropic/kimi-k2.5',
+            'anthropic/MiniMax-M2.5', 'anthropic/qwen3-coder-plus',
+            'anthropic/qwen3-coder-next', 'anthropic/qwen3-max-2026-01-23'
+        )
+        foreach ($modelId in $defaultLiteLLMModels) {
+            $secondaryModelsSection += "      ${modelId}:`n"
+            $secondaryModelsSection += "        context_length: 1000000`n"
+        }
+    }
+}
+
+# Build config.yaml content
+if ($hasOKMD -and $hasLiteLLM) {
+    # Both providers - include both in config
+    $configContent = @"
 # Hermes Agent Configuration
 # Configured by install-windows.ps1 at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
-# Primary Provider: $primaryProvider (Free Models)
+# Primary Provider: OKMD (Free Models) + Secondary: LiteLLM (Course 0)
 
 model:
   provider: $primaryProvider
@@ -966,7 +1010,14 @@ providers:
     base_url: $primaryBaseUrl
     default_model: $primaryDefaultModel
     models:
-$($modelsSection)    transport: openai_chat
+$($primaryModelsSection)    transport: openai_chat
+
+  $secondaryProvider`:
+    api_key: $secondaryKey
+    base_url: $secondaryBaseUrl
+    default_model: $secondaryDefaultModel
+    models:
+$($secondaryModelsSection)    transport: openai_chat
 
 # Dashboard
 dashboard:
@@ -987,6 +1038,47 @@ security:
 privacy:
   redact_pii: false
 "@
+}
+else {
+    # Single provider
+    $configContent = @"
+# Hermes Agent Configuration
+# Configured by install-windows.ps1 at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
+# Primary Provider: $primaryProvider
+
+model:
+  provider: $primaryProvider
+  default: $primaryDefaultModel
+  base_url: $primaryBaseUrl
+
+providers:
+  $primaryProvider`:
+    api_key: $primaryKey
+    base_url: $primaryBaseUrl
+    default_model: $primaryDefaultModel
+    models:
+$($primaryModelsSection)    transport: openai_chat
+
+# Dashboard
+dashboard:
+  enabled: true
+  port: 9119
+
+# Security & Permissions
+approvals:
+  mode: off
+
+# Telegram Gateway
+telegram:
+  reactions: true
+
+security:
+  redact_secrets: false
+
+privacy:
+  redact_pii: false
+"@
+}
 
 [System.IO.File]::WriteAllText($configFile, $configContent, [System.Text.UTF8Encoding]::new($false))
 if ($primaryModels.Count -gt 0) {
@@ -1129,7 +1221,12 @@ Write-Host '  - Hermes -> %LOCALAPPDATA%\hermes\hermes-agent (git clone)' -Foreg
 Write-Host '  - agy -> ~/AppData/Local/agy/bin/' -ForegroundColor White
 Write-Host ''
 Write-Host 'Configuration:' -ForegroundColor Cyan
-if ($primaryProvider -eq 'okmd') {
+if ($hasOKMD -and $hasLiteLLM) {
+    Write-Host "  - Primary: OKMD AI Playground (Free Models)" -ForegroundColor Green
+    Write-Host "  - Secondary: LiteLLM Proxy (Course 0)" -ForegroundColor Yellow
+    Write-Host "  - Models: $($OKMDModels.Count) OKMD + $($LiteLLMModels.Count) LiteLLM = $($OKMDModels.Count + $LiteLLMModels.Count) total" -ForegroundColor White
+}
+elseif ($hasOKMD) {
     Write-Host "  - Primary: OKMD AI Playground (Free Models)" -ForegroundColor Green
     Write-Host "  - Models: $($OKMDModels.Count) free models available" -ForegroundColor White
 }

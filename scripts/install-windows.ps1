@@ -348,13 +348,8 @@ if (-not $SkipInstall) {
 
         for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
             Write-Info "  Clone attempt $attempt of $MaxRetries..."
-            if ($attempt -eq 1) {
-                # Show output on first attempt for debugging
-                & git clone --depth 1 https://github.com/NousResearch/hermes-agent.git $TargetDir 2>&1
-            } else {
-                # Hide output on retries
-                & git clone --depth 1 https://github.com/NousResearch/hermes-agent.git $TargetDir 2>&1 | Out-Null
-            }
+            # Use 2>$null to suppress git stderr (progress output), check LASTEXITCODE for success
+            & git clone --depth 1 https://github.com/NousResearch/hermes-agent.git $TargetDir 2>$null
             if ($LASTEXITCODE -eq 0) { return $true }
             if ($attempt -lt $MaxRetries) {
                 $delay = $attempt * 10

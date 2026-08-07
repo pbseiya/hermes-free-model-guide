@@ -348,8 +348,8 @@ if (-not $SkipInstall) {
 
         for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
             Write-Info "  Clone attempt $attempt of $MaxRetries..."
-            # Use 2>$null to suppress git stderr (progress output), check LASTEXITCODE for success
-            & git clone --depth 1 https://github.com/NousResearch/hermes-agent.git $TargetDir 2>$null
+            # Use cmd /c to properly suppress git stderr (PowerShell NativeCommandError issue)
+            cmd /c "git clone --depth 1 https://github.com/NousResearch/hermes-agent.git `"$TargetDir`" 2>nul 1>nul"
             if ($LASTEXITCODE -eq 0) { return $true }
             if ($attempt -lt $MaxRetries) {
                 $delay = $attempt * 10

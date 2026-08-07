@@ -98,10 +98,31 @@ Write-Ok 'Startup shortcuts removed'
 # --- Step 4: Remove hermes installation ---
 Write-Step 'Step 4: Remove hermes installation'
 
+# Helper: Fast directory removal using robocopy trick
+function Remove-Fast {
+    param([string]$Path)
+    if (-not (Test-Path $Path)) { return }
+
+    # For directories with many files (node_modules), use robocopy trick
+    $emptyDir = Join-Path $env:TEMP "empty_for_rmdir_$([guid]::NewGuid().ToString('N').Substring(0,8))"
+    if (-not (Test-Path $emptyDir)) {
+        New-Item -ItemType Directory -Path $emptyDir -Force | Out-Null
+    }
+    
+    # Use robocopy to empty the directory (much faster than Remove-Item)
+    cmd /c "robocopy `"$emptyDir`" `"$Path`" /MIR /NFL /NDL /NJH /NJS /nc /ns /np" 2>&1 | Out-Null
+    
+    # Remove the now-empty directory
+    Remove-Item $Path -Force -ErrorAction SilentlyContinue
+    
+    # Clean up temp directory
+    Remove-Item $emptyDir -Force -ErrorAction SilentlyContinue
+}
+
 $hermesDir = Join-Path $env:LOCALAPPDATA 'hermes'
 if (Test-Path $hermesDir) {
     Write-Info 'Removing hermes directory...'
-    Remove-Item $hermesDir -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Fast -Path $hermesDir
     if (-not (Test-Path $hermesDir)) {
         Write-Ok 'Hermes removed'
     } else {
@@ -125,7 +146,7 @@ $dirsToRemove = @(
 foreach ($dir in $dirsToRemove) {
     if ($dir.Remove -or $Force) {
         if (Test-Path $dir.Path) {
-            Remove-Item $dir.Path -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Fast -Path $dir.Path
             if (-not (Test-Path $dir.Path)) {
                 Write-Ok "$($dir.Name) removed"
             } else {

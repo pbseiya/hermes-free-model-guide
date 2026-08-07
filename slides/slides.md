@@ -133,34 +133,34 @@ style: |
 
 | Model | Provider | Quota/วัน | เหมาะสำหรับ |
 |-------|----------|-----------|-------------|
-| `gpt-4o` | OpenAI | 350K | ฉลาดสุดของ OpenAI |
-| `gpt-4o-mini` | OpenAI | 350K | สมดุลดี (แนะนำ) |
-| `gpt-4-turbo` | OpenAI | 350K | เร็ว, ประหยัด |
-| `claude-3-5-sonnet` | Anthropic | 180K | ฉลาด, งานซับซ้อน |
-| `claude-3-haiku` | Anthropic | 180K | เร็ว, เบา |
-| `deepseek-chat` | DeepSeek | **1M** | Reasoning, วิเคราะห์ |
-| `deepseek-coder` | DeepSeek | **1M** | เขียนโค้ด, quota เยอะสุด |
+| `gpt-5.4` | OpenAI | 350K | ฉลาดสุดของ OpenAI |
+| `gpt-5.4-mini` | OpenAI | 350K | สมดุลดี (แนะนำ) |
+| `gpt-5.4-nano` | OpenAI | 350K | เร็ว, ประหยัด |
+| `claude-sonnet-5` | Anthropic | 180K | ฉลาด, งานซับซ้อน |
+| `claude-sonnet-4.6` | Anthropic | 180K | เร็ว, เบา |
+| `deepseek-v4-flash` | DeepSeek | **1M** | Reasoning, วิเคราะห์ (quota เยอะสุด) |
+| `deepseek-v4-pro` | DeepSeek | **1M** | งานซับซ้อน, คุณภาพสูง |
 
 ---
 
 # 💰 Free Models (ต่อ)
 
-## Models อื่นๆ ที่น่าสนใจ
+### Models อื่นๆ ที่น่าสนใจ
 
 ### Meta, xAI, Qwen, Google, Mistral, AWS
 
 | Model | Provider | Quota/วัน | เหมาะสำหรับ |
 |-------|----------|-----------|-------------|
-| `llama-3.1-70b` | Meta AI | 200K | Opensource, ฉลาด |
-| `llama-3.1-8b` | Meta AI | 200K | Opensource, เร็ว |
-| `grok-beta` | xAI | 100K | ข้อมูลล่าสุด |
-| `qwen-72b-chat` | Qwen | 100K | ภาษาดี |
-| `qwen-14b-chat` | Qwen | 100K | เร็ว, เบา |
-| `gemini-2.0-flash` | Google | 200K | เร็ว, เบา |
-| `gemini-1.5-pro` | Google | 200K | ฉลาด, งานซับซ้อน |
-| `mistral-large` | Mistral | 100K | ยุโรป, หลายภาษา |
-| `amazon.nova-pro` | AWS | 200K | AWS |
-| `amazon.nova-lite` | AWS | 200K | เร็ว, เบา |
+| `llama-4-maverick` | Meta AI | 200K | Opensource, ฉลาด |
+| `llama-4-scout` | Meta AI | 200K | Opensource, เร็ว |
+| `grok-4.3` | xAI | 100K | ข้อมูลล่าสุด |
+| `qwen3.7-plus` | Qwen | 100K | ภาษาดี |
+| `qwen3.7-max` | Qwen | 100K | เร็ว, เบา |
+| `gemini-3.5-flash` | Google | 200K | เร็ว, เบา |
+| `gemini-3.1-flash-lite` | Google | 200K | ฉลาด, งานซับซ้อน |
+| `mistral-medium-3.1` | Mistral | 100K | ยุโรป, หลายภาษา |
+| `nova-pro-v1` | AWS | 200K | AWS |
+| `nova-2-lite-v1` | AWS | 200K | เร็ว, เบา |
 
 <div class="warning">
 
@@ -208,8 +208,13 @@ style: |
 
 ### Windows (PowerShell)
 
+**วิธีที่ 1: สั้น (แนะนำ)**
 ```powershell
-# เปิด PowerShell แล้ววางคำสั่งนี้
+irm https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/install-windows.ps1 | iex
+```
+
+**วิธีที่ 2: ยาว (เสถียรกว่า สำหรับ interactive prompts)**
+```powershell
 $f="$env:TEMP\hermes-install.ps1"; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbseiya/hermes-free-model-guide/main/scripts/install-windows.ps1' -OutFile $f -UseBasicParsing; powershell -ExecutionPolicy Bypass -File $f; Remove-Item $f
 ```
 
@@ -1312,7 +1317,7 @@ hermes gateway start      # Telegram bot
 
 <div class="success">
 
-**💡 เคล็ดลับ:** ถ้าไม่ได้ใส่ค่าตอนติดตั้ง ไม่ต้องกังวล! ใส่ทีหลังได้เสมอด้วยคำสั่ง `hermes setup`
+**💡 เคล็ดลับ:** ถ้าไม่ได้ใส่ค่าตอนติดตั้ง ไม่ต้องกังวล! ใส่ทีหลังได้เสมอโดยแก้ไฟล์ `.env` โดยตรง
 
 </div>
 

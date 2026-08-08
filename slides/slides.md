@@ -56,7 +56,7 @@ style: |
 ---
 
 <div class="avatar-left">
-<img src="../images/hermes-evangelion.jpg" alt="Hermes Avatar">
+<img src="../images/hermes-mascot-v1.jpg" alt="Hermes Avatar">
 </div>
 
 <div class="content-right">

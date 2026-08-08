@@ -65,3 +65,4 @@ images/*.png
 images/*.webp
 images/*.ico
 !images/.gitkeep
+!images/hermes-evangelion.jpg

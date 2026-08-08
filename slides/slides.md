@@ -3,7 +3,6 @@
 marp: true
 theme: default
 paginate: true
-header: "Course 0: ติดตั้ง Hermes Agent + Free Model"
 footer: "ใช้ OKMD AI Playground — ฟรี 23 models สูงสุด 1M tokens/day"
 style: |
   section {

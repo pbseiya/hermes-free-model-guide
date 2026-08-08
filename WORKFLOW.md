@@ -67,8 +67,8 @@
 ### สำหรับผู้เรียน
 
 - **ดูสไลด์ออนไลน์:** https://pbseiya.github.io/hermes-free-model-guide/slides/slides.html
-- **ดาวน์โหลด PDF:** https://drive.google.com/uc?id=1X8aDiBmyKhcMlnN-Hm5lIxhWyWiufKXN&export=download
-- **ดู PDF บน Drive:** https://drive.google.com/file/d/1X8aDiBmyKhcMlnN-Hm5lIxhWyWiufKXN/view
+- ดาวน์โหลด: `https://drive.google.com/uc?id=12sisF4K18mlohYuf87ZFX12AkmJxzn2a&export=download`
+- ดูออนไลน์: `https://drive.google.com/file/d/12sisF4K18mlohYuf87ZFX12AkmJxzn2a/view`
 
 ### สำหรับแก้ไข
 
@@ -81,8 +81,8 @@
 
 | ไฟล์ | ID | คำอธิบาย |
 |------|-----|---------|
-| OKMD Course Materials (folder) | `1mzdk2OAZv1zVCbEdcvJt4KAXClpJo1lL` | โฟลเดอร์หลัก |
-| slides.pdf | `1X8aDiBmyKhcMlnN-Hm5lIxhWyWiufKXN` | สไลด์ PDF |
+| OKMD Course Materials (folder) | `1M2415PjoQdZhz87AvX_BuVKT6rrBgmEB` | โฟลเดอร์หลัก |
+| slides.pdf | `12sisF4K18mlohYuf87ZFX12AkmJxzn2a` | สไลด์ PDF |
 | pre_training_reminder_1day.html | `1o9Qr8SXLP7_9WzSFTQJQWrWxZLgmkFT4` | อีเมลแจ้งเตือนล่วงหน้า 1 วัน |
 | registration_confirmation.html | `1tfXi4k3sA3-xVgdxFqnK6h_PaKkGlEEF` | อีเมลยืนยันการลงทะเบียน |
 | poster_okmd_23_ai_models.png | `1dUTRx7T64Jvew7dASQCj4jlSmR3DLiUq` | โปสเตอร์ |
